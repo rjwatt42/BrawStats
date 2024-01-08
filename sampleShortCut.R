@@ -6,6 +6,11 @@ sampleShortCut<-function(IV,IV2,DV,effect,design,evidence,nsims,appendData,oldRe
   rp_effects<-c()
   p_effects<-c()
   n_effects<-c()
+  if (IV$type=="Categorical") {
+    df1<-IV$ncats-1
+  } else {
+    df1<-1
+  }
   
   while (length(r_effects)<nsims) {
     sample_increase<-min(nsims-length(r_effects),nsims)
@@ -52,23 +57,30 @@ sampleShortCut<-function(IV,IV2,DV,effect,design,evidence,nsims,appendData,oldRe
               pops<-tanh(pops)
             }
     )
+    popsOld<-pops
     if (effect$world$populationNullp>0) {
       change<-rand(length(pops),1)<=effect$world$populationNullp
       pops[change]<-0
     }
     # make some sample sizes
-    if (design$sNRand) {
-      ns<-5+rgamma(sample_increase,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK)
-      ns<-round(ns)
+    if (design$sN<1) {
+      pops1<-pops
+      pops1[pops==0]<-popsOld[pops==0]
+      ns<-rw2n(pops1,design$sN)
     } else {
       ns<-rep(design$sN,sample_increase)
+      if (design$sNRand) {
+        ns<-minN+rgamma(sample_increase,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
+        ns<-round(ns)
+      }
     }
+    
     s1<-1/sqrt(ns-3)
     rs<-tanh(rnorm(sample_increase,mean=atanh(pops),sd=s1))
     ps<-(1-pnorm(atanh(abs(rs)),0,s1))*2
     
     if (sigOnly) {
-      keep<-isSignificant(STMethod,ps,rs,ns,evidence)
+      keep<-isSignificant(STMethod,ps,rs,ns,df1,evidence)
       pops<-pops[keep]
       rs<-rs[keep]
       ps<-ps[keep]
@@ -79,11 +91,11 @@ sampleShortCut<-function(IV,IV2,DV,effect,design,evidence,nsims,appendData,oldRe
     p_effects=c(p_effects,ps)
     n_effects=c(n_effects,ns)
   }
-
   if (appendData && !isempty(oldResult)) {
     result<-list(rIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldResult$rIV),
                  rpIV=rbind(matrix(r_effects[1:nsims],ncol=1),oldResult$rpIV),
                  nval=rbind(matrix(n_effects[1:nsims],ncol=1),oldResult$nval),
+                 df1=rbind(matrix(rep(df1,nsims),ncol=1),oldResult$df1),
                  pIV=rbind(matrix(p_effects[1:nsims],ncol=1),oldResult$pIV)
                  )
     
@@ -91,9 +103,11 @@ sampleShortCut<-function(IV,IV2,DV,effect,design,evidence,nsims,appendData,oldRe
   result<-list(rIV=matrix(r_effects[1:nsims],ncol=1),
                rpIV=matrix(rp_effects[1:nsims],ncol=1),
                nval=matrix(n_effects[1:nsims],ncol=1),
+               df1=matrix(rep(df1,nsims),ncol=1),
                pIV=matrix(p_effects[1:nsims],ncol=1)
                )
   }
+  result$participant<-1:length(result$rIV)
   result$showType<-evidence$showType
   result$effect<-effect
   result$design<-design

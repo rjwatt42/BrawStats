@@ -1,4 +1,3 @@
-source("varUtilities.R")
 
 mv2dens<-function(x,rho,break1,break2){
   mu=c(0,0)
@@ -38,7 +37,7 @@ drawRibbon<-function(x,y,yoff) {
 }
 
 drawParParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
-  theta=seq(0,2*pi,2*pi/101)
+  theta=seq(0,2*pi,length.out=varNPoints)
   d<-acos(rho)
   x=cos(theta+d/2)
   y=cos(theta-d/2)
@@ -63,7 +62,7 @@ drawOrdParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pbreaks<-seq(0,1,1/(ng))
   ebreaks<-(pbreaks-0.5)*2
   
-  y<-seq(-1,1,0.01)*fullRange
+  y<-seq(-1,1,length.out=varNPoints)*fullRange
   np<-length(y)
   pts<-data.frame(x=c(),y=c(),yoff=c(),value=c(),ids=c())
   for (id in 1:ng) {
@@ -84,8 +83,8 @@ drawOrdParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
 drawCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   ncats<-IV$ncats
   l<-IV$cases
-  if (sum(sapply(l,nchar))>10) {
-    l<-sapply(l,shrinkString,ceil(10/length(l)))
+  if (sum(sapply(l,nchar))>12) {
+    l<-sapply(l,shrinkString,ceil(12/length(l)))
   }
   pp<-CatProportions(IV)
   b<-(1:ncats)-1
@@ -93,7 +92,7 @@ drawCatParPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pbreaks<-seq(0,1,1/(ncats))
   ebreaks<-qnorm(pbreaks)
   
-  y<-seq(-1,1,0.01)*fullRange
+  y<-seq(-1,1,length.out=varNPoints)*fullRange
   yshape<-c(y,rev(y))
   if (length(IV$vals)>0){
     # dealing with a sample
@@ -152,7 +151,7 @@ drawParOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pbreaks<-seq(0,1,1/(ng))
   ebreaks<-(pbreaks-0.5)*2
 
-  x<-seq(-1,1,0.01)*fullRange
+  x<-seq(-1,1,length.out=varNPoints)*fullRange
   np<-length(x)
   pts<-data.frame(x=c(),y=c(),yoff=c(),value=c(),ids=c())
   for (id in 1:ng) {
@@ -173,8 +172,8 @@ drawCatOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   ncats1<-IV$ncats
   pp1<-CatProportions(IV)
   l1=IV$cases
-  if (sum(sapply(l1,nchar))>10) {
-    l1<-sapply(l1,shrinkString,ceil(10/length(l1)))
+  if (sum(sapply(l1,nchar))>12) {
+    l1<-sapply(l1,shrinkString,ceil(12/length(l1)))
   }
   b1<-(1:ncats1)-1
   
@@ -263,7 +262,7 @@ drawParCatPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   pbreaks<-seq(0,1,1/(ncats))
   ebreaks<-qnorm(pbreaks)
   
-  x<-seq(-1,1,0.01)*fullRange
+  x<-seq(-1,1,length.out=varNPoints)*fullRange
   np<-length(x)
   pts<-data.frame(x=c(),y=c(),yoff=c(),value=c(),ids=c())
   for (id in 1:ncats) {
@@ -352,7 +351,7 @@ drawOrdOrdPopulation<-function(IV,DV,rho,Heteroscedasticity,alpha){
   g+scale_x_continuous(breaks=b1)+scale_y_continuous(breaks=b2)+scale_alpha_continuous(range = c(0, 1))
 }
 
-drawPopulation<-function(IV,DV,effect,alpha=1){
+drawPopulation<-function(IV,DV,effect,alpha=1,theme=diagramTheme){
   rho<-effect$rIV
   if (is.na(rho)) {rho<-0}
   
@@ -429,7 +428,6 @@ drawPopulation<-function(IV,DV,effect,alpha=1){
           }
   )
 }
-  g+plotTheme+theme(plot.margin=popplotMargins)+
-    labs(x=IV$name,y=DV$name)
+  g+labs(x=IV$name,y=DV$name)+theme
   
 }

@@ -27,7 +27,6 @@ changeUI2Data<-function() {
   updateNumericInput(session,"sN",value=length(unique(importedData[[1]])))
   if (switches$doBootstrap) {
     shinyjs::showElement(id= "EvidenceHypothesisApply")
-    shinyjs::showElement(id= "LGEvidenceHypothesisApply")
   }
   updateTabsetPanel(session, "Hypothesis",selected = "Variables")
   updateTabsetPanel(session, "Evidence",selected = "Single")
@@ -48,7 +47,6 @@ changeUI2Data<-function() {
   
   if (!switches$doBootstrap) {
     shinyjs::hideElement(id="EvidenceHypothesisApply")
-    shinyjs::hideElement(id= "LGEvidenceHypothesisApply")
     updateActionButton(session,"EvidencenewSample", label="Analyze")
     hideTab("Hypothesis","Effects")
     hideTab("Evidence","Multiple")
@@ -56,10 +54,10 @@ changeUI2Data<-function() {
   } else {
     updateActionButton(session,"EvidencenewSample", label="Resample")
     if (input$IV2choice=="none") {
-      updateSelectInput(session,"Explore_typeH", choices=hypothesisChoices2Plain)
+      updateSelectInput(session,"Explore_typeH", choices=hypothesisChoicesV2Plain)
     }
     else {
-      updateSelectInput(session,"Explore_typeH", choices=hypothesisChoices3Plain)
+      updateSelectInput(session,"Explore_typeH", choices=hypothesisChoicesV3Plain)
     }
     updateSelectInput(session,"Explore_VtypeH",choices=c("& type"="Type"))
     updateSelectInput(session,"Explore_typeD",choices=c("Sample Size" = "SampleSize"))
@@ -92,7 +90,6 @@ changeUI2Simulations<-function() {
   
   if (switches$doBootstrap) {
     shinyjs::hideElement(id= "EvidenceHypothesisApply")
-    shinyjs::hideElement(id= "LGEvidenceHypothesisApply")
   }
   updateTabsetPanel(session, "Hypothesis",selected = "Variables")
   updateNumericInput(session,"rIV",value=0)
@@ -115,9 +112,9 @@ changeUI2Simulations<-function() {
   showTab("Evidence","Multiple")
   shinyjs::showElement(id="uiExplore")
   if (input$IV2choice=="none") {
-    updateSelectInput(session,"Explore_typeH", choices=hypothesisChoices2)
+    updateSelectInput(session,"Explore_typeH", choices=hypothesisChoicesV2)
   } else {
-    updateSelectInput(session,"Explore_typeH", choices=hypothesisChoices3)
+    updateSelectInput(session,"Explore_typeH", choices=hypothesisChoicesV3)
   }
   updateSelectInput(session,"Explore_VtypeH",choices=variableChoices)
   updateSelectInput(session,"Explore_typeD",choices=designChoices)
@@ -140,7 +137,7 @@ changeUI2Simulations<-function() {
 }
 
 observeEvent(input$AllowResampling,{
-  if (debug) print("9")
+  if (debug) debugPrint("AllowResampling")
   switches$doBootstrap<<-input$AllowResampling
   
   switch(input$Using,
@@ -153,7 +150,7 @@ observeEvent(input$AllowResampling,{
 })
 
 observeEvent(input$Using,{
-  if (debug) print("10")
+  if (debug) debugPrint("Using")
   
   if (variablesHeld==input$Using) {return()}
   if (input$Using=="OK") {return()}

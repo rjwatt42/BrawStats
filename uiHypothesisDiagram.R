@@ -1,41 +1,29 @@
 
-if (switches$doWorlds) {
-  HypothesisDiagram <-
-    
+worldDiagram<-function() {
+  if (switches$doWorlds) {
+    tabPanel("World",
+             style = paste("background: ",maincolours$graphC,"margin:0px;padding:0px;"), 
+             plotOutput("WorldPlot"),
+             plotOutput("WorldPlot2")
+    )
+  } else {
+    c()
+  }
+}
+
+
+  HypothesisDiagram <-function() {
     wellPanel(
       style = paste("background: ",maincolours$panelC), 
       tabsetPanel(type="tabs",
                   id="HypothesisDiagram",
                   tabPanel("Hypothesis",
-                           style = paste("background: ",maincolours$graphC), 
+                           style = paste("background: ",maincolours$graphC,"margin:0px;padding:0px;"), 
                            plotOutput("HypothesisPlot")
                   ),
-                  tabPanel("World",
-                           style = paste("background: ",maincolours$graphC), 
-                           plotOutput("WorldPlot")
-                  )
+                  worldDiagram()
       ),
       width="8cm"
     )
+  }
   
-} else {
-HypothesisDiagram <-
-  
-  wellPanel(
-    style = paste("background: ",maincolours$panelC), 
-    tabsetPanel(type="tabs",
-                id="HypothesisDiagram",
-                tabPanel("Hypothesis",
-                         style = paste("background: ",maincolours$graphC), 
-                         plotOutput("HypothesisPlot")
-                )
-    ),
-    width="8cm"
-  )
-
-worldDiagramReserve<-tabPanel("World",
-         style = paste("background: ",maincolours$graphC), 
-         plotOutput("WorldPlot")
-)
-
-}

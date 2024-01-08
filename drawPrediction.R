@@ -1,12 +1,6 @@
-plotDescriptionCols = c()
-CatCatcols=c()
 
-doLegendBars=TRUE
 drawBars<-TRUE
 drawBaseline<-TRUE
-
-source("varUtilities.R")
-source("getLogisticR.R")
 
 
 drawParParPrediction<-function(g,IV,DV,rho,n,offset=1){
@@ -20,7 +14,7 @@ drawParParPrediction<-function(g,IV,DV,rho,n,offset=1){
     xoff=-0.25+off*0.5
   }
   
-  x<-seq(-fullRange,fullRange,0.01)
+  x<-seq(-fullRange,fullRange,length.out=varNPoints)
   y<-x*rho
   se<-sqrt((1+x^2)/n)*qnorm(0.975)
   y_lower<-y-se
@@ -74,8 +68,8 @@ drawCatParPrediction<-function(g,IV,DV,rho,n,offset= 1){
     }
   }
   l<-IV$cases
-  if (sum(sapply(l,nchar))>10) {
-    l<-sapply(l,shrinkString,ceil(10/length(l)))
+  if (sum(sapply(l,nchar))>12) {
+    l<-sapply(l,shrinkString,ceil(12/length(l)))
   }
   
   # se<-se*2
@@ -103,7 +97,7 @@ drawParOrdPrediction<-function(g,IV,DV,rho,n,offset=1){
     xoff=-0.25+off*0.5
   }
   
-  x<-seq(-fullRange,fullRange,0.01)
+  x<-seq(-fullRange,fullRange,length.out=varNPoints)
   y<-x*rho
   se<-sqrt((1+x^2)/n)*qnorm(0.975)
   y_lower<-y-se
@@ -182,7 +176,7 @@ drawParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   l<-DV$cases
   b<-(1:ncats)-1
 
-  x<-seq(-fullRange,fullRange,0.01)
+  x<-seq(-fullRange,fullRange,length.out=varNPoints)
   yv<-get_logistic_r(rho,ncats,x)
   x1<-x*IV$sd+IV$mu
   xv<-c(x1,rev(x1))
@@ -204,7 +198,7 @@ drawParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
   
   if (drawBars) {
     if (length(IV$vals)>0)  {
-      bin_breaks<-c(-Inf,seq(-1,1,length.out=10)*fullRange*sd(IV$vals)+mean(IV$vals),Inf)
+      bin_breaks<-c(-Inf,seq(-1,1,length.out=varNPoints-1)*fullRange*sd(IV$vals)+mean(IV$vals),Inf)
       dens2<-hist(IV$vals,breaks=bin_breaks,freq=TRUE,plot=FALSE,warn.unused = FALSE)
       bins=dens2$mids
       
@@ -228,7 +222,7 @@ drawParCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
       }
     } else {
       dens2<-1
-      bins<-seq(-1,1,length.out=10)*fullRange*IV$sd+IV$mu
+      bins<-seq(-1,1,length.out=varNPoints-1)*fullRange*IV$sd+IV$mu
       full_x<-c()
       full_y<-c()
       full_f<-c()
@@ -330,7 +324,7 @@ drawCatCatPrediction<-function(g,IV,DV,rho,n,offset= 1){
 }
 
 
-drawPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
+drawPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL,theme=diagramTheme){
   
   n<-design$sN
   hypothesisType=paste(IV$type,DV$type,sep=" ")
@@ -513,6 +507,32 @@ drawPrediction<-function(IV,IV2,DV,effect,design,offset=1,g=NULL){
   #       
   #     }
   #   }
-  g<-g+labs(x=IV$name,y=DV$name)+plotTheme+theme(plot.margin=popplotMargins)
+  g<-g+labs(x=IV$name,y=DV$name)+theme
   
+}
+
+drawWorldSampling<-function(effect,design,sigOnly=FALSE) {
+  g<-ggplot()
+
+  if (effect$world$worldAbs) {
+    vals<-seq(-1,1,length=worldNPoints*2+1)*r_range
+    dens<-fullRSamplingDist(vals,effect$world,design,sigOnly=sigOnly) 
+    if (effect$world$populationNullp>0) {
+      dens<-dens*(1-effect$world$populationNullp) +
+        fullRSamplingDist(vals,NULL,design,sigOnly=sigOnly)
+    }
+    vals<-vals[worldNPoints+(1:worldNPoints)]
+    dens<-dens[worldNPoints+(1:worldNPoints)]
+  } else {
+    vals<-seq(-1,1,length=worldNPoints)*r_range
+    dens<-fullRSamplingDist(vals,effect$world,design,sigOnly=sigOnly) 
+  }
+  dens<-dens/max(dens)
+  
+  x<-c(vals[1],vals,1)
+  y<-c(0,dens,0)
+  pts=data.frame(x=x,y=y)
+  g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="yellow")+scale_y_continuous(limits = c(0,1.05),labels=NULL,breaks=NULL)
+  
+  g<-g+labs(x=bquote(r[sample]),y="Frequency")+diagramTheme
 }

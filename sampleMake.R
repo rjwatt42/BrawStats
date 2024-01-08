@@ -10,20 +10,36 @@ make_debug=FALSE
 makeSampleVals<-function(n,mn,sdv,MV,distr="normal"){
   switch (distr,
           "normal"= {
+            ivr<-rnorm(n,0,1)
             if (MV$type=="Interval" && (MV$skew!=0 || MV$kurtosis!=3)){
-              a<-f_johnson_M(0,sdv,MV$skew,MV$kurtosis)
-              ivr<-rJohnson(n,parms=a)
-            } else {
-              ivr<-rnorm(n,0,sdv)
+              if (MV$kurtosis<1.05) MV$kurtosis<-1.05
+              change<-MV$skew!=0 & (MV$kurtosis-3)>MV$skew^2
+              MV$kurtosis[change]<-MV$skew[change]^2 + 3
+              
+              a<-f_johnson_M(0,1,MV$skew,MV$kurtosis)
+              ivr<-f_johnson_z2y(ivr,a$coef,a$type)
+              # ivr<-rJohnson(n,parms=a)
             }
-            ivr+mn
+            ivr*sdv+mn
+          },
+          "skewed"={
+            skew<-2
+            kurtosis<-3
+            ivr<-rnorm(n,0,1)
+            a<-f_johnson_M(0,sdv,skew,kurtosis)
+            ivr<-f_johnson_z2y(ivr,a$coef,a$type)
+            ivr*sdv+mn
           },
           "uniform"={
-            ivr=runif(n,min=-1,max=1)*sdv/sqrt(3)+mn
+            ivr=runif(n,min=-1,max=1)*sdv*sqrt(3)+mn
           },
           "Cauchy"={
             ivr=rcauchy(n,location=0,scale=1)*qnorm(0.75)
             ivr=ivr*sdv+mn
+          },
+          "t(3)"={
+            ivr<-rt(n,3,0)/sqrt(3/(3-2))
+            ivr<-ivr*sdv+mn
           }
   )
 }
@@ -42,11 +58,15 @@ makeSampleVar<-function(design,n,MV){
             },
             "Stratified"={
               # sampled at specific intervals
-              r<-seq(-design$sR_Strata,design$sR_Strata,length.out=design$sN_Strata)
-              dens<-dnorm(r)
-              dens<-round(dens/sum(dens)*n)
-              ivr1<-rep(r,dens)
-              ivr<-ivr[sample(length(ivr1),length(ivr1))]
+              if (MV$type=="Categorical") {
+                ivr1<-((1:MV$ncats) - ceil(MV$ncats/2))/floor(MV$ncats/2)
+              } else {
+                r<-seq(-design$sR_Strata,design$sR_Strata,length.out=design$sN_Strata)
+                dens<-dnorm(r)
+                dens<-round(dens/sum(dens)*n)
+                ivr1<-rep(r,dens)
+                ivr<-ivr[sample(length(ivr1),length(ivr1))]
+              }
               dvr1_m<-rep(0,n)
               dvr1_s<-rep(1,n)
             },
@@ -168,9 +188,52 @@ makeSampleVar<-function(design,n,MV){
 
 makeSample<-function(IV,IV2,DV,effect,design){
   
+  rho<-effect$rIV
+  
+  if (effect$world$worldOn) {
+    if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
+      switch (effect$world$populationRZ,
+              "r"={
+                switch (effect$world$populationPDF,
+                        "Single"={rho<-effect$world$populationPDFk},
+                        "Uniform"={rho<-runif(1,min=-1,max=1)},
+                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=1)*sign(runif(1,min=-1,max=1))},
+                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
+                )
+              },
+              "z"={
+                switch (effect$world$populationPDF,
+                        "Single"={rho<-effect$world$populationPDFk},
+                        "Uniform"={rho<-runif(1,min=-10,max=10)},
+                        "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))},
+                        ">"={rho<-runif(1,min=effect$world$populationPDFk,max=10)*sign(runif(1,min=-1,max=1))},
+                        "<"={rho<-runif(1,min=-1,max=1)*effect$world$populationPDFk}
+                )
+                rho<-tanh(rho)
+              }
+      )
+      rhoOld<-rho
+      if (effect$world$populationNullp>0) {
+        if (runif(1)<=effect$world$populationNullp)
+        {rho<-0}
+      }
+      rho<-max(min(rho,0.99),-0.99)
+    }
+  }
+  
   n<-design$sN
+  if (n<1) {
+    if (effect$world$worldOn && rho==0) {
+      n<-rw2n(rhoOld,n)
+    } else {
+    n<-rw2n(rho,n)
+    }
+  }
   if (design$sNRand) {
-    n<-5+rgamma(1,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK)
+    n<-minN+rgamma(1,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
     while (n>100000) {n<-rgamma(1,shape=design$sNRandK,scale=design$sN/design$sNRandK)}
   }
   n<-round(n)
@@ -216,6 +279,7 @@ makeSample<-function(IV,IV2,DV,effect,design){
         iv2<-0
       }
       dv<-lastSample$dv[use]
+      rho<-0
       sampleRho<-0
       samplePval<-0
       
@@ -346,37 +410,6 @@ makeSample<-function(IV,IV2,DV,effect,design){
         total1<-effect$rIV2+effect$rIV*effect$rIVIV2
       }
       
-      rho<-effect$rIV
-      
-      if (effect$world$worldOn) {
-      if (!is.na(effect$world$populationRZ) && !isempty(effect$world$populationRZ)){
-        switch (effect$world$populationRZ,
-                "r"={
-                  switch (effect$world$populationPDF,
-                          "Single"={rho<-effect$world$populationPDFk},
-                          "Uniform"={rho<-runif(1,min=-1,max=1)},
-                          "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                          "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))}
-                  )
-                },
-                "z"={
-                  switch (effect$world$populationPDF,
-                          "Single"={rho<-effect$world$populationPDFk},
-                          "Uniform"={rho<-runif(1,min=-10,max=10)},
-                          "Exp"={rho<-rexp(1,rate=1/effect$world$populationPDFk)*sign((runif(1)*2-1))},
-                          "Gauss"={rho<-rnorm(1,mean=0,sd=effect$world$populationPDFk)*sign((runif(1)*2-1))}
-                  )
-                  rho<-tanh(rho)
-                }
-        )
-        if (effect$world$populationNullp>0) {
-          if (runif(1)<=effect$world$populationNullp)
-          {rho<-0}
-        }
-        rho<-max(min(rho,0.99),-0.99)
-      }
-      }
-      
       # deal with opportunity sampling    
       #  by setting up some anomalies
       if (design$sMethod=="Opportunity"){
@@ -389,7 +422,7 @@ makeSample<-function(IV,IV2,DV,effect,design){
       id<-factor(1:n)
       
       # make iv
-      data<-makeSampleVar(design,n,MV)
+      data<-makeSampleVar(design,n,IV)
       ivr<-data$ivr
       dvr_m<-data$dvr_m
       dvr_s<-data$dvr_s
@@ -430,7 +463,8 @@ makeSample<-function(IV,IV2,DV,effect,design){
                  if (IV2$source=="discrete") {
                    ng<-IV2$ncats
                    pp<-IV2$proportions
-                   # pp<-as.numeric(unlist(strsplit(IV2$proportions,",")))
+                   if (is.character(pp))
+                   pp<-as.numeric(unlist(strsplit(IV2$proportions,",")))
                    if (length(pp)<ng) {pp<-c(pp,rep(pp[length(pp)],ng-length(pp)))}
                    proportions<-c(0,pp)
                    breaks<-qnorm(cumsum(proportions)/sum(proportions))

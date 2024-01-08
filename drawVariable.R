@@ -1,31 +1,26 @@
-source("varUtilities.R")
-
-varplotMargins<-margin(0.0,-0.2,0,-1,"cm");
-darkYellow<-"#FFCC00"
-
 
 drawVar<-function(pts,var){
   if (is.null(pts)) {
     pts<-data.frame(x=0,y=0.5,t=var$name)
     ggplot()+geom_label(data=pts,aes(x=x,y=y,label=t),hjust=0.5, vjust=0.5, size=11, fontface="bold",label.size = NA)+
       labs(x="",y="")+
-      plotTheme+
+      diagramTheme+
       theme(axis.text.y=element_blank(),
             axis.ticks.y=element_blank(),
             axis.text.x=element_blank(),
             axis.ticks.x=element_blank()
       )+
-      theme(plot.margin=varplotMargins)+
+      theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))+
     coord_cartesian(xlim = c(-1,1), ylim = c(0, 1))
   } else {
   ggplot(pts,aes(x=r,y=dens))+geom_polygon(fill=plotcolours$sampleC)+
-    # geom_line(lwd=0.5)+
-    labs(x=var$name,y="")+
-    plotTheme+
-    theme(axis.text.y=element_blank(),
-          axis.ticks.y=element_blank())+
-    theme(plot.margin=varplotMargins)+
-    geom_line(aes(x=r,y=dens*0),color=plotcolours$sampleC,lwd=0.5)
+    geom_line(lwd=0.25,color="black")+
+      # geom_line(aes(x=r,y=dens*0),color="black",lwd=0.5)+
+      labs(x=var$name,y="")+
+      diagramTheme+
+      theme(axis.text.y=element_blank(),axis.ticks.y=element_blank())+
+      theme(plot.margin=margin(0.0,-0.2,0,-1,"cm"))
+    
 }
 }
 
@@ -47,8 +42,8 @@ drawCategorical<-function(var){
   }
 
   l<-var$cases[1:ng]
-  if (sum(sapply(l,nchar))>10) {
-    l<-sapply(l,shrinkString,ceil(10/ng))
+  if (sum(sapply(l,nchar))>12) {
+    l<-sapply(l,shrinkString,ceil(12/ng))
   }
 
   xlim<-c(-ng,ng)+c(-1,1)*ng/10
@@ -99,10 +94,10 @@ drawOrdinal<-function(var){
 }
 
 drawInterval<-function(var){
-  r<-seq(-fullRange,fullRange,0.1)*var$sd+var$mu
+  r<-seq(-fullRange,fullRange,length.out=varNPoints)*var$sd+var$mu
   if (var$skew!=0 || var$kurtosis!=0) {
     a<-f_johnson_M(var$mu,var$sd,var$skew,var$kurtosis)
-    dens<-dJohnson(r,parms=a)
+    dens<-f_Johnson_pdf(r,a$coef,a$type)
     dens[is.na(dens)]<-0
   } else {
     dens<-dnorm(r,var$mu,var$sd) # exp(-0.5*((r-var$mu)/var$sd)^2)

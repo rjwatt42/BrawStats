@@ -2,18 +2,17 @@ npoints=10
 min_n=10
 max_n=250
 min_prop=0.2
-effectSizeRange=0.8
-maxESrange<-0.95
 absRange<-FALSE
 quants=0.25
 
 exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explore,exploreResult,nsim,doingNull=FALSE,showProgress=FALSE){
   
-  localAlpha<-alpha
+  oldAlpha<-alphaSig
   npoints<-explore$Explore_npoints
   quants<-explore$Explore_quants
   max_n<-explore$Explore_nRange
   effectSizeRange<-explore$Explore_esRange
+  maxESrange<-explore$Explore_esRange
   anomaliesRange<-explore$Explore_anomRange
   kurtRange<-10^5
   
@@ -40,14 +39,14 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
           "EffectSize1"={
             # fullES<-effect$rIV^2+effect$rIV2^2+2*effect$rIV*effect$rIV2*effect$rIVIV2+
             b<-2*effect$rIV2*effect$rIVIV2
-            c<-effect$rIVIV2DV^2-maxESrange
+            c<-effect$rIV2^2+effect$rIVIV2DV^2-maxESrange
             r1<- (-b-sqrt(b^2-4*c))/2
             r2<-(-b+sqrt(b^2-4*c))/2
             vals<-seq(r1,r2,length.out=npoints)
             },
           "EffectSize2"={
             b<-2*effect$rIV*effect$rIVIV2
-            c<-effect$rIVIV2DV^2-maxESrange
+            c<-effect$rIV^2+effect$rIVIV2DV^2-maxESrange
             r1<- (-b-sqrt(b^2-4*c))/2
             r2<-(-b+sqrt(b^2-4*c))/2
             vals<-seq(r1,r2,length.out=npoints)
@@ -62,7 +61,7 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
             vals<-vals*effectSizeRange
             },
           
-          "PDF"={vals<-c("Single","Uniform","Gauss","Exp")},
+          "PDF"={vals<-c("Single","Uniform","Gauss","Exp",">","<")},
           "k"={vals<-10^seq(-1,-0.1,length.out=npoints)},
           "pNull"={vals<-seq(0,1,length.out=npoints)},
           
@@ -75,18 +74,36 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
           },
           "Method"={vals<-c("Random","Stratified","Cluster","Convenience","Snowball")},
           "Usage"={vals<-c("Between","Within")},
-          "Alpha"={vals<-c(0.001,0.0025,0.005,0.01,0.025,0.05,0.1,0.25,0.5)},
+          "SampleGamma"={vals<-seq(1,10,length.out=npoints)},
+          "Alpha"={
+            if (explore$Explore_xlog) {
+            vals<-vals<-10^seq(log10(0.001),log10(0.5),length.out=npoints)
+            } else {
+              vals<-vals<-seq(0.001,0.1,length.out=npoints)
+            }
+            },
           "Dependence"={vals<-seq(0,anomaliesRange,length.out=npoints)},
           "Outliers"={vals<-seq(0,anomaliesRange,length.out=npoints)},
           "Heteroscedasticity"={vals<-seq(0,1,length.out=npoints)},
+          "Transform"={vals<-c("None","Log","Exp")},
           "IVRange"={vals<-seq(3,0.5,length.out=npoints)},
           "DVRange"={vals<-seq(3,0.5,length.out=npoints)},
-          "Cheating"={vals<-c("Grow","Prune","Replace","Retry")},
-          "CheatingK"={vals<-round(seq(0.1,0.5,length.out=npoints)*design$sN)},
+          "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
+          "CheatingAmount"={
+            if (explore$Explore_xlog){
+              vals<-round(10^seq(log10(1),log10(max_n),length.out=npoints))
+            }else{
+              if ((max_n+1)<npoints) vals<-0:max_n
+              else vals<-round(seq(0,max_n,length.out=npoints))
+            }
+          },
           
           "SigOnly"={vals<-c("Yes","No")},
           "Power"={vals<-seq(0.1,0.9,length.out=npoints)},
-          "Repeats" ={vals<-seq(1,explore$Explore_nrRange,length.out=explore$Explore_nrRange)},
+          "Repeats" ={
+            if (design$sReplKeep=="median") vals<-seq(0,explore$Explore_nrRange,by=2)
+            else vals<-seq(0,explore$Explore_nrRange)
+            },
           
           "NoStudies"={
             if (explore$Explore_Mxlog){
@@ -380,12 +397,17 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
                      },
             
             "Heteroscedasticity"={effect$Heteroscedasticity<-vals[i]},
+            "Transform"={evidence$Transform<-vals[i]},
             "SampleSize"={design$sN<-round(vals[i])},
             "Method"={design$sMethod<-vals[i]},
             "Usage"={design$sIV1Use<-vals[i]},
+            "SampleGamma"={
+              design$sNRand<-TRUE
+              design$sNRandK<-vals[i]
+              },
             "Alpha"={
-              alpha<<-vals[i]
-              alphaLLR<<-0.5*qnorm(1-alpha/2)^2
+              alphaSig<<-vals[i]
+              alphaLLR<<-0.5*qnorm(1-alphaSig/2)^2
             },
             "Dependence"={design$sDependence<-vals[i]},
             "Outliers"={design$sOutliers<-vals[i]},
@@ -400,12 +422,12 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
             "Cheating"={
               design$sCheating<-vals[i]
             },
-            "CheatingK"={
-              design$sCheatingK<-vals[i]
+            "CheatingAmount"={
+              design$sCheatingAmount<-vals[i]
             },
             
             "SigOnly"={
-              design$sReplSigOnly<-(vals[i]=="Yes")
+              design$sReplSigOnly<-vals[i]
             },
             "Power"={
             design$sReplPower<-vals[i]
@@ -429,30 +451,36 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
     #   effect$rIVIV2DV<-0
     # }
 
+      if (explore$Explore_show=="likelihood") 
+      {
+        exploreResult$rIVs<-matrix(0,nrow=nsim,ncol=1)
+        exploreResult$likes<-rnorm(length(vals))
+        exploreResult$vals<-vals
+        exploreResult$Explore_type<-explore$Explore_type
+        exploreResult$Explore_show<-explore$Explore_show
+        exploreResult$Explore_typeShow<-explore$Explore_typeShow
+        exploreResult$Explore_family<-explore$Explore_family
+        return(exploreResult)
+        
+      } 
+      
       if (explore$Explore_family=="MetaAnalysis") {
-        # if (explore$ExploreLongHand) {
           result<-multipleAnalysis(IV,IV2,DV,effect,design,evidence,metaAnalysis$nstudies,FALSE,metaResult$result,sigOnly=metaAnalysis$sig_only,
                                    showProgress=FALSE,progressPrefix=paste0("MetaAnalysis: ",metaResult$count+1,":"))
-        # } else {
-        #   result<-sampleShortCut(IV,IV2,DV,effect,design,evidence,metaAnalysis$nstudies,FALSE,metaResult$result,sigOnly=metaAnalysis$sig_only)
-        # }
         metaResult$result<-result
         metaResult<-runMetaAnalysis(metaAnalysis,metaResult)
         main_res$ks<-cbind(main_res$ks,metaResult$bestK)
         main_res$pnulls<-cbind(main_res$pnulls,metaResult$bestNull)
         main_res$Ss<-cbind(main_res$Ss,metaResult$bestS)
-        main_res$dists<-cbind(main_res$dists,metaResult$bestDist==effect$world$populationPDF)
+        main_res$dists<-cbind(main_res$dists,metaResult$bestDist)
         main_res$rval<-cbind(main_res$rval,metaResult$bestS)
       } else {
-        # if (explore$ExploreLongHand) {
         res<-multipleAnalysis(IV,IV2,DV,effect,design,evidence,1,appendData=FALSE,sigOnly=FALSE,showProgress=FALSE)
-        # } else {
-        #   res<-sampleShortCut(IV,IV2,DV,effect,design,evidence,1,appendData=FALSE,sigOnly=FALSE)
-        # }
         main_res$rval<-cbind(main_res$rval,res$rIV)
         main_res$rpval<-cbind(main_res$rpval,res$rpIV)
         main_res$pval<-cbind(main_res$pval,res$pIV)
         main_res$nval<-cbind(main_res$nval,res$nval)
+        main_res$df1<-cbind(main_res$df1,res$df1)
 
         if (!is.null(IV2)){
           main_res$r1$direct<-cbind(main_res$r1$direct,res$r$direct[,1])
@@ -492,10 +520,12 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
       
     } else {
       exploreResult$rIVs<-rbind(exploreResult$rIVs,main_res$rval)
+      # if (!is.null(exploreResult$rpIVs))
       exploreResult$rpIVs<-rbind(exploreResult$rpIVs,main_res$rpval)
       exploreResult$pIVs<-rbind(exploreResult$pIVs,main_res$pval)
-        exploreResult$nvals<-rbind(exploreResult$nvals,main_res$nval)
-        
+      exploreResult$nvals<-rbind(exploreResult$nvals,main_res$nval)
+      exploreResult$df1vals<-rbind(exploreResult$df1vals,main_res$df1)
+      
         exploreResult$r1$direct<-rbind(exploreResult$r1$direct,main_res$r1$direct)
         exploreResult$r1$unique<-rbind(exploreResult$r1$unique,main_res$r1$unique)
         exploreResult$r1$total<-rbind(exploreResult$r1$total,main_res$r1$total)
@@ -529,11 +559,11 @@ exploreSimulate <- function(IV,IV2,DV,effect,design,evidence,metaAnalysis,explor
         # }
       }
     }
-  removeNotification(id = "counting")
+  # removeNotification(id = "counting")
   
-  alpha<<-localAlpha
-  alphaLLR<<-0.5*qnorm(1-alpha/2)^2
-  
+  alphaSig<<-oldAlpha
+  alphaLLR<<-0.5*qnorm(1-alphaSig/2)^2
+
   exploreResult$vals<-vals
   exploreResult$Explore_type<-explore$Explore_type
   exploreResult$Explore_show<-explore$Explore_show

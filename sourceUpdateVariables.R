@@ -2,11 +2,18 @@
 ## update variables functions
 
 updateIV<-function(){
-  if (debug) print("     updateIV")
+  if (debug) debugPrint("     updateIV")
   use<-match(input$IVchoice,variables$name)
   if (is.na(use)) return(NULL)
-  
+
   IV<-as.list(variables[use,])
+  
+  if (IV$type!="Interval" && shortHand) {
+    hmm("Please switch to longhand calculations: IV not Interval")
+  }
+  if (any(c(IV$skew,IV$kurtosis-3)!=0) && shortHand) {
+    hmm("Please switch to longhand calculations: IV skew/kurtosis")
+  }
   
   if (IV$type=="Categorical") {
     cs<-IV$cases
@@ -23,18 +30,16 @@ updateIV<-function(){
   if (simData) {
     IV$deploy<-input$sIV1Use
   }
-  if (debug) print("     updateIV - exit")
+  if (debug) debugPrint("     updateIV - exit")
   return(IV)
 }
 
 updateIV2<-function(){
-  if (debug) print("     updateIV2")
+  if (debug) debugPrint("     updateIV2")
   if (input$IV2choice=="none"){
-    no_ivs<<-1
-    if (debug) print("     updateIV2 - exit unused")
+    if (debug) debugPrint("     updateIV2 - exit unused")
     return(NULL)
   } else {
-    no_ivs<<-2
   }
   
   use<-match(input$IV2choice,variables$name)
@@ -58,12 +63,12 @@ updateIV2<-function(){
   if (simData) {
     IV2$deploy<-input$sIV2Use
   }
-  if (debug) print("     updateIV2 - exit")
+  if (debug) debugPrint("     updateIV2 - exit")
   return(IV2)
 }
 
 updateDV<-function(){
-  if (debug) print("     updateDV")
+  if (debug) debugPrint("     updateDV")
   use<-match(input$DVchoice,variables$name)
   if (is.na(use)) return(NULL)
   
@@ -73,6 +78,13 @@ updateDV<-function(){
       hmm("Ordinal DV with more than 1 IV. It will be treated as Interval.")
       warn3Ord<<-TRUE
     }
+  }
+  
+  if (DV$type!="Interval" && shortHand) {
+    hmm("Please switch to longhand calculations: DV not Interval")
+  }
+  if (any(c(DV$skew,DV$kurtosis-3)!=0) && shortHand) {
+    hmm("Please switch to longhand calculations: DV skew/kurtosis")
   }
   
   if (DV$type=="Categorical") {
@@ -88,14 +100,14 @@ updateDV<-function(){
     }
     #             IV$proportions<-MV$prop
   }
-  if (debug) print("     updateDV - exit")
+  if (debug) debugPrint("     updateDV - exit")
   return(DV)
 }
 
 # UI changes    
 observeEvent(c(input$rIV,input$rIV2,input$rIVIV2,input$rIVIV2DV,
                input$sN,input$sMethod,input$sIV1Use,input$sIV2Use),{
-                 if (debug) print("     effectChanged")
+                 if (debug) debugPrint("     effectChanged")
                  
                  # remove out of date sample and other 
                  validSample<<-FALSE
@@ -104,15 +116,15 @@ observeEvent(c(input$rIV,input$rIV2,input$rIVIV2,input$rIVIV2DV,
                  
                  # expectedResult<-c()
                  exploreResultHold<-list(Hypothesis=c(),Design=c(),MetaAnalysis=c())
-                 likelihood_P_ResultHold<-c()
-                 likelihood_S_ResultHold<-c()
+                 possiblePResultHold<-c()
+                 possibleSResultHold<-c()
                  
                  updateCheckboxInput(session,"EvidenceExpected_append",value=FALSE)
                  updateCheckboxInput(session,"ExploreAppendH",value=FALSE)
                  updateCheckboxInput(session,"ExploreAppendD",value=FALSE)
                  updateCheckboxInput(session,"ExploreAppendM",value=FALSE)
                  
-                 if (debug) print("     effectChanged - exit")
+                 if (debug) debugPrint("     effectChanged - exit")
                },priority=100)
 
 observeEvent(c(input$IVchoice,input$IV2choice,input$DVchoice),

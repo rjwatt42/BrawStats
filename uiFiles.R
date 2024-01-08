@@ -1,4 +1,5 @@
 source("uiBatchFiles.R")
+source("uiMetaFiles.R")
 
 FilesTab <-
 
@@ -8,15 +9,10 @@ wellPanel(
   fluidRow(headerText("Import and export files")),
   tabsetPanel(type="tabs",id="FileTab",
               # single tab
-              tabPanel("Files:",id="Files",
-                       style = paste("background: ",subpanelcolours$filesC), 
-                       fluidRow(
-                       )
+              tabPanel("Files:",id="Files"
               ),
               tabPanel("Hypothesis",
                        style = paste("background: ",subpanelcolours$filesC), 
-                       wellPanel(
-                         style = paste("background: ",subpanelcolours$filesC,";"),
                          tags$table(width = "100%",class="myTable",
                                     tags$tr(
                                       tags$td(width = "5%", style="border-top: 1px solid black;border-left: 1px solid black;", tags$div(style = localStyle, "import:")),
@@ -51,12 +47,9 @@ wellPanel(
                                               actionButton("wsCopy","Export")),
                                     ))
                          )
-                       )
               ),
               tabPanel("Data",
                        style = paste("background: ",subpanelcolours$filesC), 
-                       wellPanel(
-                         style = paste("background: ",subpanelcolours$filesC,";"),
                          tags$table(width = "100%",class="myTable",
                                     tags$tr(
                                       tags$td(width = "5%", style="border-top: 1px solid black;border-left: 1px solid black;", tags$div(style = localStyle, "import:")),
@@ -76,7 +69,7 @@ wellPanel(
                                     tags$tr(
                                       tags$td(width = "5%", style="border-bottom: 1px solid black;border-top: 1px solid black;border-left: 1px solid black;",tags$div(style = localStyle, "export:")),
                                       tags$td(width = "50%", style="border-bottom: 1px solid black;border-top: 1px solid black;",
-                                              textInput("DataoutputFile",label=NULL)),
+                                              textInput("dataOutputFile",label=NULL)),
                                       tags$td(width = "5%", style="border-bottom: 1px solid black;border-top: 1px solid black;border-right: 1px solid black;",
                                               actionButton("dataOutputFileSave","Save")),
                                     ),
@@ -91,14 +84,11 @@ wellPanel(
                                               actionButton("dCopy","Export")),
                                     ))
                          )
-                         )
               ),
               batchTab
               # options tab
               ,tabPanel("#",value="##",
                         style = paste("background: ",subpanelcolours$filesC),
-                        wellPanel(
-                          style = paste("background: ",subpanelcolours$filesC,";"),
                           tags$table(width = "100%",class="myTable",
                                      tags$tr(
                                        tags$td(width = "40%", tags$div(style = localPlainStyle, "Import Ordinals: ")),
@@ -113,14 +103,12 @@ wellPanel(
                                        tags$td(width = "20%", checkboxInput("ExportShortForm", value=TRUE, label=NULL)),
                                      )
                           )
-                        )
               )
               # help tab
               ,tabPanel(helpChar,value="?",
                         style = paste("background: ",subpanelcolours$filesC),
-                        wellPanel(
-                          style = paste("background: ",subpanelcolours$filesC,";"),
-                          tags$table(width = "100%",class="myTable",
+
+                                                  tags$table(width = "100%",class="myTable",
                                      tags$tr(
                                        tags$div(style = helpStyle, 
                                                 tags$br("Import/export workspace/sample:"),
@@ -135,7 +123,6 @@ wellPanel(
                                        ),
                                      )
                           )
-                        )
               )
   )
 )

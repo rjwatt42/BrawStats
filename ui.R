@@ -7,38 +7,6 @@
 #    http://shiny.rstudio.com/
 #
 
-list.of.packages<-c("shiny","shinyWidgets","shinyjs","shinyBS",
-                    "ggplot2","tidyr","tools",
-                    "mnormt","lme4","MuMIn",
-                    "readxl","writexl","car","stringi","stringr","clipr","SuppDists","e1071","pracma",
-                    "htmlwidgets"
-                    )
-new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages)
-
-library(shiny)
-library(shinyWidgets)
-library(shinyjs)
-library(shinyBS)
-library(htmlwidgets)
-
-library(ggplot2)
-library(tidyr)
-library(tools)       # system
-
-# library(gridExtra)   # not sure any longer
-library(mnormt)      # pmnorm for logistic
-library(lme4)        # lmer (mixed models)
-library(MuMIn)       # r-squared for mixed models
-library(readxl)      # excel
-library(writexl)     # x excel
-library(car)         # Anova type 3 correct
-library(stringr)     # for str_* functions
-library(clipr)       # for clipboard functions
-library(SuppDists)   # for Johnson distributions
-library(e1071)       # for skewness and kurtosis
-library(pracma)      # for meshgrid
-
 source("uiHeaderText.R") # headers to each tab
 
 source("uiHypothesis.R")
@@ -46,11 +14,11 @@ source("uiHelp.R")
 source("uiDesign.R")
 source("uiEvidence.R")
 source("uiExplore.R")
-source("uiLikelihood.R")
+source("uiPossible.R")
 source("uiFiles.R")
 
 source("uiWorld.R")
-if (switches$doMetaAnalysis) {source("uiMetaAnalysis.R")}
+source("uiMetaAnalysis.R")
 source("uiPrior.R")
 
 
@@ -62,44 +30,58 @@ source("uiMetaGraph.R")
 source("uiPossibleGraph.R")
 
 source("uiInspectDiagram.R")
-source("uiLargeEvidence.R")
-source("uiLargeMeta.R")
-source("uiLargeExplore.R")
-source("uiLargeLikelihood.R")
 
-source("uiHypothesisPart.R")
-source("uiEffectPart.R")
-source("uiVariablesPart.R")
-
-graphH="50vh"
-reportH="30vh"
+  graphH="50vh"
+  graphH1="90vh"
+  reportH="30vh"
+  reportH1="60vh"
+  popH="30vh"
+  graphW=8
 
 shinyUI(fluidPage(
     useShinyjs(),
     
     tags$style(type="text/css",".recalculating {opacity: 1.0;}" ),   
 
+    tags$head(tags$style(paste0("#HypothesisPlot{height:",graphH," !important;}"))),
+    tags$head(tags$style(paste0("#WorldPlot{height:","25vh"," !important;}"))),
+    tags$head(tags$style(paste0("#WorldPlot2{height:","25vh"," !important;}"))),
+    
+    tags$head(tags$style(paste0("#PopulationPlot{height:",popH," !important;}"))),
+    tags$head(tags$style(paste0("#PredictionPlot{height:",popH," !important;}"))),
+    
+    
     tags$head(tags$style(paste0("#SamplePlot{height:",graphH," !important;}"))),
     tags$head(tags$style(paste0("#DescriptivePlot{height:",graphH," !important;}"))),
     tags$head(tags$style(paste0("#InferentialPlot{height:",graphH," !important;}"))),
     tags$head(tags$style(paste0("#ExpectedPlot{height:",graphH," !important;}"))),
     tags$head(tags$style(paste0("#ExplorePlot{height:",graphH," !important;}"))),
-    tags$head(tags$style(paste0("#LikelihoodPlot{height:",graphH," !important;}"))),
+    tags$head(tags$style(paste0("#PossiblePlot{height:",graphH," !important;}"))),
     tags$head(tags$style(paste0("#MetaAnalysisPlot{height:",graphH," !important;}"))),
     
-    tags$head(tags$style(paste0("#HypothesisPlot{height:",graphH," !important;}"))),
-    tags$head(tags$style(paste0("#WorldPlot{height:",graphH," !important;}"))),
+    tags$head(tags$style(paste0("#SamplePlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#DescriptivePlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#InferentialPlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#ExpectedPlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#ExplorePlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#PossiblePlot1{height:",graphH1," !important;}"))),
+    tags$head(tags$style(paste0("#MetaAnalysisPlot1{height:",graphH1," !important;}"))),
     
     tags$head(tags$style(paste0("#SampleReport{height:",reportH," !important;}"))),
     tags$head(tags$style(paste0("#DescriptiveReport{height:",reportH," !important;}"))),
     tags$head(tags$style(paste0("#InferentialReport{height:",reportH," !important;}"))),
     tags$head(tags$style(paste0("#ExpectedReport{height:",reportH," !important;}"))),
     tags$head(tags$style(paste0("#ExploreReport{height:",reportH," !important;}"))),
-    tags$head(tags$style(paste0("#LikelihoodReport{height:",reportH," !important;}"))),
+    tags$head(tags$style(paste0("#PossibleReport{height:",reportH," !important;}"))),
     tags$head(tags$style(paste0("#MetaAnalysisReport{height:",reportH," !important;}"))),
-
-    tags$head(tags$style(paste0("#PopulationPlot{height:",reportH," !important;}"))),
-    tags$head(tags$style(paste0("#PredictionPlot{height:",reportH," !important;}"))),
+    
+    tags$head(tags$style(paste0("#SampleReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#DescriptiveReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#InferentialReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#ExpectedReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#ExploreReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#PossibleReport1{height:",reportH1," !important;}"))),
+    tags$head(tags$style(paste0("#MetaAnalysisReport1{height:",reportH1," !important;}"))),
     
     tags$head(tags$script('
                         var width = 0;
@@ -136,8 +118,7 @@ shinyUI(fluidPage(
         });"
         )
     ),
-    tags$script("$(document).on('hidden.bs.modal', function(event) {Shiny.onInputChange('LGmodal_close','Closed');})"),
-    
+
     tags$head(
         tags$style(type = 'text/css', paste("#SampleReport         {background-color: ", maincolours$graphC, ";}")),
         tags$style(type = 'text/css', paste("#DescriptiveReport    {background-color: ", maincolours$graphC, ";}")),
@@ -156,19 +137,7 @@ shinyUI(fluidPage(
     tags$style(type="text/css", ".shiny-file-input-progress { display: none }"),
     
     tags$head(
-        tags$style(
-            HTML(".shiny-notification {position:fixed;top: calc(20%);left: calc(55%);}")
-        )
-    ),
-    
-    # 
-    # tags$style("#DataTabset { display:none; }"), 
-    # 
-    tags$head(
         tags$style(paste0("label{font-size: ",format(8*fontScale) ,"pt;}")),
-        # tags$style(HTML( # textInput
-        #     ".form-control {font-size: 8pt; height:20px; padding:0px 0px; margin-top:-20px; margin-bottom:-5px; min-height:10px;}"
-        # )),
         tags$style(HTML( # textInput
             paste0(".form-control {font-size: ",format(8*fontScale) ,"pt; height:20px; padding:0px 0px;}")
         )),
@@ -205,15 +174,24 @@ shinyUI(fluidPage(
             ".tabbable > .nav > .active > a {font-weight: bold; color:black;  background-color:white; }",
             paste0(".nav-tabs {font-size: ",format(8*fontScale) ,"pt; padding:0px; margin-bottom:0px;} "),
         )),
+        tags$style(HTML( # tab panes
+          ".tab-content {margin:0px;padding:0px;}"
+        )),
+        tags$style(HTML( # tab panes
+          ".tab-pane {margin:0px;padding-left:20px; padding-right:5px; padding-bottom:2px; padding-top:2px;}"
+        )),
         tags$style(HTML( # well panels
                 ".well {padding:5px; margin:0px;margin-bottom:8px;margin-left:0px;margin-right:0px;} ",
         )),
-        tags$style(HTML(paste(".help-block b {color:", maincolours$panelC,  "!important;margin:0px;padding:0px;margin-bottom:8px;font-size:",format(12*fontScale) ,"pt; font-weight:bold;}"))),
-        tags$style(HTML(paste(".help-block a {color:", maincolours$panelC,  "!important;margin:0px;padding:0px;margin-bottom:8px;font-size:",format(8*fontScale) ,"pt; font-weight:normal;font-style: italic;}"))),
-        tags$style(HTML(paste0(".btn-file {padding:0px; margin: 0px; font-size:",format(8*fontScale) ,"pt; font-weight:Bold; color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:8px;margin-right:12px;margin-top:0px;margin-left:0px}")
+        tags$style(HTML( # checkbox
+            ".checkbox {line-height: 10px;margin:0px;padding:0px;padding-left:4px;}"
         )),
-        tags$style(HTML(
-            ".checkbox {line-height: 10px;margin:0px;padding:0px;}"
+           # help panel specifics
+        tags$style(HTML(paste(".help-block b {color:", maincolours$panelC,  "!important;margin:0px;padding:0px;margin-bottom:8px;font-size:",format(12*fontScale) ,"pt; font-weight:bold;}")
+        )),
+        tags$style(HTML(paste(".help-block a {color:", maincolours$panelC,  "!important;margin:0px;padding:0px;margin-bottom:8px;font-size:",format(8*fontScale) ,"pt; font-weight:normal;font-style: italic;}")
+        )),
+        tags$style(HTML(paste0(".btn-file {padding:0px; margin: 0px; font-size:",format(8*fontScale) ,"pt; font-weight:Bold; color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:8px;margin-right:12px;margin-top:0px;margin-left:0px}")
         )),
     ),
     tags$head( # input tables
@@ -221,68 +199,9 @@ shinyUI(fluidPage(
     ),
     tags$head(
       tags$style(
-        HTML(".shiny-notification {position:fixed;top: calc(5%);left: calc(50.5%);}"
-        )
+        HTML(paste0(".shiny-notification {background-color:", maincolours$panelC,";color:#FFFFFF;position:fixed;top: calc(24.5%);left: calc(51%);}"
+        ))
       )
-    ),
-    
-
-    tags$head(
-      tags$style(HTML(
-        '#LGEvidenceStart{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      )),
-      tags$style(HTML(
-        '#LGEvidenceStart1{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      )),
-      tags$style(HTML(
-        '#LGEvidenceStart2{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      )),
-      tags$style(HTML(
-        '#LGEvidenceStart3{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      )),
-      tags$style(HTML(
-        '#LGMetaStart{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      )),
-      tags$style(HTML(
-        '#LGExploreStart{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-        )),
-        tags$style(HTML(
-          '#LGPossibleStart{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-        )),
-      tags$style(HTML(
-        '#LGMetaStart1{font-size:",format(8*fontScale) ,"pt;font-weight:Bold;color:white; background-color: #005886;height:20px;padding-top:0px;padding-bottom:0px;padding-left:4px;padding-right:4px;margin-bottom:4px;margin-right:12px;margin-top:4px;margin-left:0px}'
-      ))
-    ),
-    
-    
-    tags$head( # large Graphs
-      tags$style(type="text/css",paste0('#LGmodalPossible .modal-dialog { width:',LGModalWidth ,' ;','}')),
-      tags$style(type="text/css",paste0('#LGmodalPossible .modal-body    { width: 100%; height: ', LGModalHeight  ,'; background-color:',maincolours$windowC ,' ;}')),
-      tags$style(type="text/css",'#LGmodalPossible .modal-header {border: 0px; padding: 0px}'),
-      tags$style(type="text/css",'#LGmodalPossible .modal { text-align: right; padding:0px; border: 0;}'),
-      tags$style(type="text/css","#LGmodalPossible .modal-footer{ display:none}"),
-      tags$style(type="text/css","#LGmodalPossible .modal-header{ display:none}"),
-      
-      tags$style(type="text/css",paste0('#LGmodalExplore .modal-dialog { width:',LGModalWidth ,' ;}')),
-      tags$style(type="text/css",paste0('#LGmodalExplore .modal-body    { width: 100%; height: ', LGModalHeight  ,'; background-color:',maincolours$windowC ,' ;}')),
-      tags$style(type="text/css",'#LGmodalExplore .modal-header {border: 0px; padding: 0px}'),
-      tags$style(type="text/css",'#LGmodalExplore .modal { text-align: right; padding:0px; border: 0;}'),
-      tags$style(type="text/css","#LGmodalExplore .modal-footer{ display:none}"),
-      tags$style(type="text/css","#LGmodalExplore .modal-header{ display:none}"),
-      
-      tags$style(type="text/css",paste0('#LGmodalMeta .modal-dialog { width:',LGModalWidth ,' ;}')),
-      tags$style(type="text/css",paste0('#LGmodalMeta .modal-body    { width: 100%; height: ', LGModalHeight  ,'; background-color:',maincolours$windowC ,' ;}')),
-      tags$style(type="text/css",'#LGmodalMeta .modal-header {border: 0px; padding: 0px}'),
-      tags$style(type="text/css",'#LGmodalMeta .modal { text-align: right; padding:0px; border: 0;}'),
-      tags$style(type="text/css","#LGmodalMeta .modal-footer{ display:none}"),
-      tags$style(type="text/css","#LGmodalMeta .modal-header{ display:none}"),
-      
-      tags$style(type="text/css",paste0('#LGmodalEvidence .modal-dialog { width:',LGModalWidth ,' ;}')),
-      tags$style(type="text/css",paste0('#LGmodalEvidence .modal-body    { width: 100%; height: ', LGModalHeight  ,'; background-color:',maincolours$windowC ,' ;}')),
-      tags$style(type="text/css",'#LGmodalEvidence .modal-header {border: 0px; padding: 0px;}'),
-      tags$style(type="text/css",'#LGmodalEvidence .modal { text-align: right; padding:0px; border: 0;}'),
-      tags$style(type="text/css","#LGmodalEvidence .modal-footer{ display:none; }"),
-      tags$style(type="text/css","#LGmodalEvidence .modal-header{ display:none; }"),
     ),
     
     # Application title
@@ -304,7 +223,7 @@ shinyUI(fluidPage(
                          # Explore panel
                          ExploreTab,
                          # Likelihood panel
-                         LikelihoodTab,
+                         PossibleTab,
                          # Files panel
                          FilesTab
                      ),
@@ -314,22 +233,9 @@ shinyUI(fluidPage(
                  # results
                  mainPanel(
                      style = paste("background: ",maincolours$windowC,";margin-left: 10px;padding-left: 0px;margin-right: -10px;padding-right: -10px;margin-top:5px;"), 
-                     column(width=4,
-                            style = paste("margin-left: 4px;padding-left: 0px;margin-right: -10px;padding-right: -10px;"),
-                            HypothesisDiagram,
-                            PopulationDiagram
-                     ),
-                     column(width=8,
-                            style = paste("margin-left: 4px;padding-left: 0px;margin-right: -10px;padding-right: -10px;"),
-                            MainGraphs,
-                            MainReports
-                     ),
+                     uiOutput("mainColumns"),
                      bsModal(id="debugOutput", title="tested Outputs", trigger="testedOutputButton", size = "large",plotOutput("plotPopUp")),
                      inspectDiagram,
-                     LGmodalEvidence,
-                     LGmodalMeta,
-                     LGmodalExplore,
-                     LGmodalPossible,
                      width = 9
                  ),
         ),

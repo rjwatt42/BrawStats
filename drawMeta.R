@@ -1,6 +1,8 @@
 source("runMetaAnalysis.R")
+
 nscaleLog=FALSE
 maxnPlot=3
+absPlot<-TRUE
 
 makeMetaHist<-function(vals,use,xlim) {
   nbins<-10
@@ -9,25 +11,20 @@ makeMetaHist<-function(vals,use,xlim) {
   h<-list(bins=bins,dens=dens)
 }
 
-drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
-  
+drawMeta<-function(metaAnalysis,metaResult,metaWhich,yaxis=TRUE) {
+  # browser()
   yall<-c(metaResult$single$Smax,metaResult$gauss$Smax,metaResult$exp$Smax)
   displayType<-"histograms"
 
   n1<-sum(metaResult$bestDist=="Single")
   n2<-sum(metaResult$bestDist=="Gauss")
   n3<-sum(metaResult$bestDist=="Exp")
-  use<-which.max(c(n1,n2,n3))
-  bestD<-c("Single","Gauss","Exp")[use]
-  fullText<-paste0("\u2014",bestD,"(",format(mean(metaResult$bestK),digits=3),")"," ",format(sum(metaResult$bestDist==bestD)),"/",length(metaResult$bestDist))
-  if (metaAnalysis$meta_nullAnal) {
-    fullText<-paste0(fullText," null=",format(mean(metaResult$bestNull),digits=3))
-  }
   
   if (metaWhich=="Plain") {
     d1<-metaResult$result$rIV
     d1n<-(metaResult$result$rpIV==0)
     xlim<-c(-1, 1)
+    if (absPlot) xlim<-c(0,1)
     d2<-metaResult$result$nval
     disp2<-"n"
     ylim<-c(5, maxnPlot*metaResult$design$sN*1.1)
@@ -36,16 +33,17 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
       disp2<-bquote(log[10] (.(disp2)))
       ylim<-log10(ylim)
     }
+    if (absPlot) d1<-abs(d1)
     use<-(d2>ylim[1]) & (d2<ylim[2])
     pts<-data.frame(x=d1[use],y=d2[use])
     usen<-(d2>ylim[1]) & (d2<ylim[2] & d1n)
     ptsn<-data.frame(x=d1[usen],y=d2[usen])
     
     g<-ggplot(pts,aes(x=x, y=y))
-    if (length(d1)>1200) {
-      nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))
-      nbins<-min(nbins,51)
-      g<-g+stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c("#666666",plotcolours$descriptionC))
+    if (length(d1)>=1200) {
+      nbins<-diff(ylim)/(2*IQR(d2[use])*length(d2[use])^(-0.33))*2
+      nbins<-min(nbins,101)
+      g<-g+stat_bin2d(data=pts,aes(x=x,y=y),bins=nbins)+scale_fill_gradientn(colours=c(graphcolours$graphBack,plotcolours$descriptionC))
     }
     
     g<-drawWorld(metaResult$design,metaResult$effect,metaResult,g,plotcolours$descriptionC,metaAnalysis$showTheory)
@@ -53,7 +51,7 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
     dotSize<-(plotTheme$axis.title$size)/3
     
     # show individual studies
-    if (length(d1)<=1200) {
+    if (length(d1)<1200) {
       dotSize<-dotSize/(ceil(length(d1)/400))
         cl<-"black"
         g<-g+geom_point(data=pts,aes(x=x, y=y),shape=shapes$study, colour = cl, fill = plotcolours$descriptionC, size = dotSize)
@@ -71,57 +69,86 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
 
     return(g)
   } else {
-    
+    sAll<-c(metaResult$single$Smax,metaResult$gauss$Smax,metaResult$exp$Smax)
     switch (metaWhich,
             "Single"={
-              x<-metaResult$single$kmax
-              y<-metaResult$single$Smax
-              y1<-metaResult$single$nullMax
+              x<-metaResult$single$Kmax
+              yS<-metaResult$single$Smax
+              y1<-metaResult$single$Nullmax
               xlim<-c(-1,1)
             },
             "Gauss"={
-              x<-metaResult$gauss$kmax
-              y<-metaResult$gauss$Smax
-              y1<-metaResult$gauss$nullMax
+              x<-metaResult$gauss$Kmax
+              yS<-metaResult$gauss$Smax
+              y1<-metaResult$gauss$Nullmax
               xlim<-c(0,1)
             },
             "Exp"={
-              x<-metaResult$exp$kmax
-              y<-metaResult$exp$Smax
-              y1<-metaResult$exp$nullMax
+              x<-metaResult$exp$Kmax
+              yS<-metaResult$exp$Smax
+              y1<-metaResult$exp$Nullmax
               xlim<-c(0,1)
+              # xlim<-c(min(x),max(x))+c(-1,1)*(max(x)-min(x))*0.2
+            },
+            "S-S"={
+              x<-metaResult$gauss$Smax
+              yS<-metaResult$exp$Smax
+              y1<-yS
             }
+            
     )
-    keep<- !is.na(x) & !is.na(y)
+    keep<- !is.na(x) & !is.na(yS)
     best<-metaResult$bestS[keep]
-    y<-y[keep]
+    yS<-yS[keep]
     y1<-y1[keep]
     x<-x[keep]
     
     if (isempty(x)) {return(ggplot()+plotBlankTheme)}
     
     if (metaAnalysis$meta_nullAnal) {
-      useBest<-y==best
+      useBest<-yS==best
       # ylim<-c(-0.5,0.5)
       # ylabel<-"S"
-      y<-y1
-      ylim<-c(-0.02,1.1)
-      ylabel<-"p(0)"
-      
+      switch (metaAnalysis$meta_showParams,
+              "S-k"={
+                y<-yS
+                ylim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
+                ylabel<-"log(lk)"
+                xlabel<-Llabel
+              },
+              "n-k"={
+                y<-y1
+                ylim<-c(-0.02,1.1)
+                ylabel<-bquote(bold(p['null']))
+                xlabel<-Llabel
+              },
+              "S-S"={
+                y<-yS
+                xlim<-c(min(sAll,na.rm=TRUE),max(sAll,na.rm=TRUE))+c(-1,1)*(max(sAll,na.rm=TRUE)-min(sAll,na.rm=TRUE))/4
+                xlabel<-"log(lk Gauss)"
+                ylim<-xlim
+                ylabel<-"log(lk Exp)"
+                useBest<- (y>x & metaResult$effect$world$populationPDF=="Exp") | (y<x & metaResult$effect$world$populationPDF=="Gauss")
+              })
       pts<-data.frame(x=x,y=y)
       g<-ggplot(pts,aes(x=x, y=y))
       
-      dotSize=min(8,max(3.5,sqrt(400/length(x))))
+      dotSize=min(4,max(4,sqrt(50/length(x))))
       # dotSize<-(plotTheme$axis.title$size)/3
-      
+
       g<-g+geom_point(data=pts,aes(x=x, y=y),shape=shapes$meta, colour = "black", fill = "grey", size = dotSize)
       pts<-data.frame(x=x[useBest],y=y[useBest])
       g<-g+geom_point(data=pts,aes(x=x, y=y),shape=shapes$meta, colour = "black", fill = "yellow", size = dotSize)
       
+      if (metaAnalysis$meta_showParams=="S-S") {
+        g<-g+geom_line(data=data.frame(x=xlim,y=ylim),aes(x=x,y=y),color="red")
+      }
       g<-g+theme(legend.position = "none")+plotTheme
-      g<-g+scale_x_continuous(limits = c(min(x),max(x))+c(-1,1)*(max(x)-min(x))*0.2)
+      g<-g+scale_x_continuous(limits = xlim)
       
-      if (metaWhich=="Single") {
+      if (!is.null(ylim)) {
+      }
+      if (yaxis) {
         g<-g+scale_y_continuous(limits = ylim)+ylab(ylabel)
       } else {
         g<-g+scale_y_continuous(limits = ylim,breaks=c())+ylab("")
@@ -153,7 +180,7 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
                   }
                   g<-g+theme(legend.position = "none")+plotTheme
                   ylim<-c(0,max(50,max(y,na.rm=TRUE)*1.1))
-                  g<-g+scale_x_continuous(limits=xlim)+xlab("k")
+                  g<-g+scale_x_continuous(limits=xlim)+xlab(Llabel)
                   g<-g+scale_y_continuous(limits=ylim,breaks=c())+ylab("")
                 } else {
                   h1<-makeMetaHist(x,use,xlim)
@@ -167,9 +194,9 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
                     g<-g+geom_polygon(data=pts,aes(x=x,y=y),fill="white",colour="black")
                   }
                   g<-g+theme(legend.position = "none")+plotTheme
-                  h2a<-makeMetaHist(metaResult$single$kmax,metaResult$single$Smax==metaResult$bestS,c(-1,1))
-                  h2b<-makeMetaHist(metaResult$gauss$kmax,metaResult$gauss$Smax==metaResult$bestS,c(0,1))
-                  h2c<-makeMetaHist(metaResult$exp$kmax,metaResult$exp$Smax==metaResult$bestS,c(0,1))
+                  h2a<-makeMetaHist(metaResult$single$Kmax,metaResult$single$Smax==metaResult$bestS,c(-1,1))
+                  h2b<-makeMetaHist(metaResult$gauss$Kmax,metaResult$gauss$Smax==metaResult$bestS,c(0,1))
+                  h2c<-makeMetaHist(metaResult$exp$Kmax,metaResult$exp$Smax==metaResult$bestS,c(0,1))
                   ylim<-c(0,max(c(h2a$dens,h2b$dens,h2c$dens)*1.2))
                   g<-g+scale_y_continuous(limits=ylim,breaks=c())+ylab("")
                 }
@@ -179,7 +206,7 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
                 pts<-data.frame(x=x,y=y)
                 g<-ggplot(pts,aes(x=x, y=y))
                 
-                dotSize=min(8,max(3.5,sqrt(400/length(x))))
+                dotSize=min(4,max(3.5,sqrt(400/length(x))))
                 # dotSize<-(plotTheme$axis.title$size)/3
                 
                 g<-g+geom_point(data=pts,aes(x=x, y=y),shape=shapes$meta, colour = "black", fill = "grey", size = dotSize)
@@ -199,12 +226,55 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
               }
       )
     }
-    g<-g+xlab("k")
-    if (metaWhich==bestD) {
-      pts_lb<-data.frame(x=mean(x), y=ylim[2], lb=fullText)
-      g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0.5,size=3,fill="yellow")
-    }
+    g<-g+xlab(xlabel)
+    if (mean(y1)>0.5) {
+      yp<-ylim[1]
+      vj<-0
+    } else {
+        yp<-ylim[2]
+        vj<-1
+        }
+    if (metaAnalysis$meta_showParams=="S-S") {
+      fullText<-paste0("Exp","(",format(mean(metaResult$exp$Kmax),digits=3),"\u00B1",format(std(metaResult$exp$Kmax),digits=2),")")
+      if (metaAnalysis$meta_nullAnal) {
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$exp$Nullmax),digits=3),"\u00B1",format(std(metaResult$exp$Nullmax),digits=2))
+      }
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$exp$Smax),digits=2),"\u00B1",format(std(metaResult$exp$Smax),digits=2)," (",format(sum(y>x)),"/",length(metaResult$bestDist),")")
+      pts_lb<-data.frame(x=xlim[1], y=ylim[2], lb=fullText)
+      if (mean(y>x)) {
+      g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0,vjust=1,size=labelSize,fill="yellow")
+      } else {
+        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0,vjust=1,size=labelSize,fill="grey")
+      }
+      fullText<-paste0("Gauss","(",format(metaResult$gauss$Kmax,digits=3),"\u00B1",format(std(metaResult$gauss$Kmax),digits=2),")")
+      if (metaAnalysis$meta_nullAnal) {
+        fullText<-paste0(fullText,"\nnull=",format(mean(metaResult$gauss$Nullmax),digits=3),"\u00B1",format(std(metaResult$gauss$Nullmax),digits=2))
+      }
+      fullText<-paste0(fullText,"\nS= ",format(mean(metaResult$gauss$Smax),digits=2),"\u00B1",format(std(metaResult$gauss$Smax),digits=2)," (",format(sum(x>y)),"/",length(metaResult$bestDist),")")
+      pts_lb<-data.frame(x=xlim[2], y=ylim[1], lb=fullText)
+      if (mean(y>x)) {
+        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=1,vjust=0,size=labelSize,fill="grey")
+      } else {
+        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=1,vjust=0,size=labelSize,fill="yellow")
+      }
+    } else {
+      lb<-paste0("\u2014",metaResult$bestDist,"(",format(metaResult$bestK,digits=3),"\u00B1",format(std(result$exp$Kmax),digits=2),")")
+      fullText<-paste0(metaWhich,"(",format(mean(x),digits=3),"\u00B1",format(std(x),digits=2),")")
+      if (metaAnalysis$meta_nullAnal) {
+        fullText<-paste0(fullText,"\nnull=",format(mean(y1),digits=3),"\u00B1",format(std(y1),digits=2))
+      }
+      fullText<-paste0(fullText,"\nS= ",format(mean(yS),digits=2),"\u00B1",format(std(yS),digits=2)," (",format(sum(metaResult$bestDist==metaWhich)),"/",length(metaResult$bestDist),")")
+      pts_lb<-data.frame(x=mean(x), y=yp, lb=fullText)
+      
+      use<-which.max(c(n1,n2,n3))
+      bestD<-c("Single","Gauss","Exp")[use]
+      if (metaWhich==bestD) {
+        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0.5,vjust=vj,size=labelSize,fill="yellow")
+      } else {
+        g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),hjust=0.5,vjust=vj,size=labelSize,fill="grey")
+      }
     g+ggtitle(metaWhich)
+    }
     return(g)
   }
   
@@ -212,10 +282,10 @@ drawMeta<-function(metaAnalysis,metaResult,metaWhich) {
 
 
 drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) {
-  x<-seq(-1,1,length.out=101)
+  x<-seq(-1,1,length.out=101)*r_range
   y<-seq(5,maxnPlot*design$sN,length.out=101)
   sigma<-1/sqrt(y-3)
-  gain<-dgamma(y-5,shape=design$sNRandK,scale=(design$sN-5)/design$sNRandK)
+  gain<-dgamma(y-minN,shape=design$sNRandK,scale=(design$sN-minN)/design$sNRandK)
   
   nbd<-31
   xbins<-seq(-1,1,length.out=nbd+1)
@@ -239,10 +309,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
   switch (effect$world$populationPDF,
           "Single"={
             for (i in 1:length(y)) {
-              z1<-SingleSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-SingleSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
              if (metaResult$metaAnalysis$sig_only) {
-               zcrit<-qnorm(1-alpha/2,0,sigma[i])
+               zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                z1[atanh(abs(x))<zcrit]<-0
              }
               z<-rbind(z,zdens2rdens(z1,x)*gain[i])
@@ -250,10 +320,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
           },
           "Gauss"={
             for (i in 1:length(y)) {
-              z1<-GaussSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-GaussSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
               if (metaResult$metaAnalysis$sig_only) {
-                zcrit<-qnorm(1-alpha/2,0,sigma[i])
+                zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                 z1[atanh(abs(x))<zcrit]<-0
               }
               z<-rbind(z,zdens2rdens(z1,x)*gain[i])
@@ -261,10 +331,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
           },
           "Exp"={
             for (i in 1:length(y)) {
-              z1<-ExpSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-ExpSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
               if (metaResult$metaAnalysis$sig_only) {
-                zcrit<-qnorm(1-alpha/2,0,sigma[i])
+                zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                 z1[atanh(abs(x))<zcrit]<-0
               }
               z<-rbind(z,zdens2rdens(z1,x)*gain[i])
@@ -281,10 +351,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
   switch (metaResult$bestDist,
           "Single"={
             for (i in 1:length(y)) {
-              z1<-SingleSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-SingleSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
               if (metaResult$metaAnalysis$meta_psigAnal) {
-                zcrit<-qnorm(1-alpha/2,0,sigma[i])
+                zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                 z1[atanh(abs(x))<zcrit]<-0
               }
               
@@ -293,10 +363,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
           },
           "Gauss"={
             for (i in 1:length(y)) {
-              z1<-GaussSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-GaussSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
               if (metaResult$metaAnalysis$meta_psigAnal) {
-                zcrit<-qnorm(1-alpha/2,0,sigma[i])
+                zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                 z1[atanh(abs(x))<zcrit]<-0
               }
               z<-rbind(z,zdens2rdens(z1,x)*gain[i])
@@ -304,10 +374,10 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
           },
           "Exp"={
             for (i in 1:length(y)) {
-              z1<-ExpSamplingPDF(atanh(x),lambda,sigma[i])*(1-nullP)+
-                ZeroSamplingPDF(atanh(x),sigma[i])*nullP
+              z1<-ExpSamplingPDF(atanh(x),lambda,sigma[i])$pdf*(1-nullP)+
+                SingleSamplingPDF(atanh(x),0,sigma[i])$pdf*nullP
               if (metaResult$metaAnalysis$meta_psigAnal) {
-                zcrit<-qnorm(1-alpha/2,0,sigma[i])
+                zcrit<-qnorm(1-alphaSig/2,0,sigma[i])
                 z1[atanh(abs(x))<zcrit]<-0
               }
               z<-rbind(z,zdens2rdens(z1,x)*gain[i])
@@ -339,13 +409,14 @@ drawWorld<-function(design,effect,metaResult,g,colour="white",showTheory=FALSE) 
   g<-g+geom_contour(data=ptsa,aes(x=x,y=y,z=z),colour="white",breaks=c(0.1,0.3,0.5,0.7,0.9)) 
   }
   # g<-g+geom_contour(data=ptsd,aes(x=x,y=y,z=z),colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),lwd=1) 
-  g<-g+geom_contour(data=ptsb,aes(x=x,y=y,z=z),colour=colour,breaks=c(0.1,0.3,0.5,0.7,0.9),lwd=1)
+  g<-g+geom_contour(data=ptsb,aes(x=x,y=y,z=z),colour="black",breaks=c(0.1,0.3,0.5,0.7,0.9),lwd=0.1)
   
-  lb<-paste0("\u2014",metaResult$bestDist,"(",format(metaResult$bestK,digits=3),")")
+  lb<-paste0("\u2014",metaResult$bestDist,"(",format(metaResult$bestK,digits=3),"\u00B1",format(std(result$exp$Kmax),digits=2),")")
   if (metaResult$metaAnalysis$meta_nullAnal) {
-    lb<-paste0(lb," null=",format(metaResult$bestNull,digits=3))
+    lb<-paste0(lb," p[null]=",format(metaResult$bestNull,digits=3),"\u00B1",format(std(result$exp$Nullmax),digits=2),"")
   }
-  pts_lb<-data.frame(x=0.5,y=max(y),lb=lb)
-  g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),colour=colour,fill="white",fontface="bold")
+  pts_lb<-data.frame(x=0,y=max(y)*1.1,lb=lb)
+  if (absPlot) pts_lb$x[1]<-0.5
+  g<-g+geom_label(data=pts_lb,aes(x=x,y=y,label=lb),colour=colour,fill="white",size=labelSize,fontface="bold")
   return(g)
 }
