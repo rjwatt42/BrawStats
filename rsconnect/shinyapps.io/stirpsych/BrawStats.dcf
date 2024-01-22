@@ -1,0 +1,13 @@
+name: BrawStats
+title: BrawStats
+username:
+account: stirpsych
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5462455
+bundleId: 8172225
+url: https://stirpsych.shinyapps.io/BrawStats/
+when: 1705956533.91193
+lastSyncTime: 1705956533.91196
+asMultiple: FALSE
+asStatic: FALSE
