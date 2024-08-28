@@ -1,7 +1,3 @@
-varTypes<- c("Interval" = "Interval",
-             "Ordinal" = "Ordinal",
-             "Categorical" = "Categorical"
-)
 
 variableDialog<-wellPanel(
   style = paste("background: ",subpanelcolours$hypothesisC,";"),

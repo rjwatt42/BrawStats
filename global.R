@@ -1,15 +1,24 @@
+# library(devtools)
+# load_all("/Users/rogerwatt/Documents/GitHub/BrawPack")
+
 source("packages.R")
+files<-dir("BrawR",full.names = TRUE)
+for (fi in 1:length(files)) source(files[fi])
+
+globalFontScale<-1.25
+BrawOpts(fontScale = globalFontScale)
 
 ################################
 
 switches<-list(doKeys=TRUE,doClipboard=FALSE,
-               doCheating=TRUE,doReplications=TRUE,doPossible=TRUE,doBootstrap=TRUE,
-               doWorlds=FALSE,doMetaAnalysis=FALSE,doLikelihoodInfer=FALSE,doPossiblePower=FALSE,
+               doCheating=TRUE,doReplications=TRUE,doBootstrap=TRUE,
+               doWorlds=TRUE,doMetaAnalysis=FALSE,doLikelihoodInfer=FALSE,doPossiblePower=FALSE,
                doVariablesExplore=FALSE,
                doBatchFiles=FALSE,
                loadExtrasValue=FALSE,
                startBlank=FALSE,
                showAnimation=TRUE,
+               showProgress=TRUE,
                importOrdinals=TRUE,
                rigidWithin=TRUE) # only applies to imported data
 
@@ -22,6 +31,7 @@ mainHue=0.55
 
 hypHue=0.986667
 desHue=0.1
+anaHue=0.21
 eviHue=0.33333
 expHue=0.65
 posHue=0.583
@@ -43,6 +53,7 @@ exploreSat=0.8
 
 panelcolours<-list(hypothesisC=hsv(hypHue,mainSat,mainBright),
                    designC=hsv(desHue,mainSat,mainBright),
+                   analysisC=hsv(anaHue,mainSat,mainBright),
                    simulateC=hsv(eviHue,mainSat,mainBright),
                    exploreC=hsv(expHue,mainSat*exploreSat,mainBright),
                    possibleC=hsv(posHue,mainSat,mainBright*likeBright),
@@ -52,6 +63,7 @@ panelcolours<-list(hypothesisC=hsv(hypHue,mainSat,mainBright),
 )
 subpanelcolours<-list(hypothesisC=hsv(hypHue,subSat,subBright),
                       designC=hsv(desHue,subSat,subBright),
+                      analysisC=hsv(anaHue,subSat,subBright),
                       simulateC=hsv(eviHue,subSat,subBright),
                       exploreC=hsv(expHue,subSat*exploreSat,subBright),
                       possibleC=hsv(posHue,subSat,subBright),
@@ -94,9 +106,6 @@ validExplore<-FALSE
 validPossible<-0
 show<-0
 
-shortHand<-FALSE      # instead of making full samples
-shortHandGain=10
-
 #####################
 # warnings to generate
 
@@ -128,15 +137,17 @@ warn3Ord<-FALSE
 #
 doStop<-TRUE
 silentTime<-0
+startLabel<-"Run"
 stopLabel<-"Stop"
 pauseWait<-300
 cycles2observe<-5
 cycleCount<-0
 
-source("getGlobals.R")
-getGlobals()
-source("getVariables.R")
-getVariables()
+variablesHeld<-"Simulated"
+# source("getGlobals.R")
+# getGlobals()
+# source("getVariables.R")
+# getVariables()
 
 ###########################################
 # fine tuning

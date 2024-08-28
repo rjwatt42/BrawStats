@@ -97,44 +97,36 @@ HelpTab <-
                                  style = paste("background: ",panelcolours$helpC),
                                  tags$table(width = "100%",class="myTable",
                                             tags$tr(
-                                              tags$td(width="30%",tags$div(style = localPlainStyle, "Load extras:")),
-                                              tags$td(width="15%",checkboxInput("LoadExtras", label=NULL,value=switches$loadExtrasValue)),
-                                              tags$td(width="30%",tags$div(style = localPlainStyle, "Large graphs:")),
-                                              tags$td(width="25%",checkboxInput("LargeGraphs", label=NULL,value=FALSE))
+                                              tags$td(width="20%",tags$div(style = labelStyle, "Graphs:")),
+                                              tags$td(width="35%",tags$div(style = localPlainStyle, "large")),
+                                              tags$td(width="5%",checkboxInput("LargeGraphs", label=NULL,value=FALSE)),
+                                              tags$td(width="35%",tags$div(style = localPlainStyle, "white")),
+                                              tags$td(width="5%",checkboxInput("WhiteGraphs", label=NULL,value=FALSE)),
                                             ),
+                                 # ),
+                                 # tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width="20%",tags$div(style = labelStyle, "Extras:")),
+                                              tags$td(width="35%",tags$div(style = localPlainStyle, "load")),
+                                              tags$td(width="5%",checkboxInput("LoadExtras", label=NULL,value=switches$loadExtras)),
+                                              tags$td(width="35%",tags$div(style = localPlainStyle, " ")),
+                                              tags$td(width="5%",tags$div(style = localPlainStyle, " ")),
+                                            )
                                  ),
                                  conditionalPanel(condition="input.LoadExtras",
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
-                                                               tags$td(width="30%",tags$div(style = localPlainStyle, "Short hand:")),
-                                                               tags$td(width="15%",checkboxInput("shortHand",value=FALSE, label=NULL)),
-                                                               tags$td(width="30%",tags$div(style = localPlainStyle, "Shorthand x:")),
-                                                               tags$td(width="25%",numericInput("shortHandGain",value=10, label=NULL))
+                                                               tags$td(width="10%",tags$div(style = labelStyle, "Calculations:")),
+                                                               tags$td(width="35%",tags$div(style = localPlainStyle, "shorthand")),
+                                                               tags$td(width="5%",checkboxInput("shortHand",value=FALSE, label=NULL)),
+                                                               tags$td(width="50%",tags$div(style = localPlainStyle, ""))
                                                              ),
                                                              tags$tr(
-                                                               tags$td(width="30%",tags$div(style = localPlainStyle, "White graphs:")),
-                                                               tags$td(width="15%",checkboxInput("WhiteGraphs", label=NULL,value=FALSE)),
-                                                               tags$td(width="30%",tags$div(style = localPlainStyle, "Display:")),
-                                                               tags$td(width="25%",selectInput("RZ",label=NULL, c("r"="r","z"="z"), selected=RZ, selectize=FALSE))
+                                                               tags$td(width="10%",tags$div(style = labelStyle, "Display:")),
+                                                               tags$td(width="35%",selectInput("RZ",label=NULL, c("r"="r","z"="z"), selected=braw.env$RZ, selectize=FALSE))
                                                              )
                                                   )
-                                 ),
-                                 # conditionalPanel(condition="input.LoadExtras",
-                                 #                  tags$table(width = "100%",class="myTable",
-                                 #                             tags$tr(
-                                 #                               tags$td(width="30%",tags$div(style = localPlainStyle, "Notation:")),
-                                 #                               tags$td(width="30%",selectInput("Notation1",label=NULL, 
-                                 #                                                               c("psig"="psig","w"="w"), 
-                                 #                                                               selected="psig", selectize=FALSE)),
-                                 #                               tags$td(width="20%",selectInput("Notation2",label=NULL, 
-                                 #                                                               c("U"="U","D"="D"), 
-                                 #                                                               selected="D", selectize=FALSE)),
-                                 #                               tags$td(width="20%",selectInput("Notation3",label=NULL, 
-                                 #                                                               c("+"="+","0"="0","-"="-"), 
-                                 #                                                               selected="0", selectize=FALSE)),
-                                 #                             )
-                                 #                  )
-                                 # )
+                                 )
                         )
             )
   )

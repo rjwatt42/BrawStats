@@ -4,7 +4,7 @@ worldDiagram<-function() {
     tabPanel("World",
              style = paste("background: ",maincolours$graphC,"margin:0px;padding:0px;"), 
              plotOutput("WorldPlot"),
-             plotOutput("WorldPlot2")
+             plotOutput("DesignPlot")
     )
   } else {
     c()

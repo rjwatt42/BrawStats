@@ -5,9 +5,9 @@
 # graphs (sample, describe, infer)
 # report (sample, describe, infer)
 #    
-applyingAnalysis<-FALSE
 
-oldResult<-NULL
+# when we change one of the evidence options, we don't make a new sample, 
+#  we just re-analyse the existing sample
 onlyAnalysis<-FALSE
 observeEvent(c(input$Welch,input$Transform,input$evidenceCaseOrder,input$analysisType,input$dataType,input$rInteractionOn),{
   onlyAnalysis<<-TRUE
@@ -20,41 +20,37 @@ observeEvent(c(input$EvidencenewSample),{
 # go to the sample tabs 
 sampleUpdate<-observeEvent(c(input$Single,input$EvidencenewSample,input$EvidenceHypothesisApply),{
   if (any(c(input$Single,input$EvidencenewSample))>0) {
-    if (!is.element(input$Graphs,c("Sample","Describe","Infer","Possible")))
-    {updateTabsetPanel(session, "Graphs",
-                       selected = "Sample")
-      updateTabsetPanel(session, "Reports",
+    if (!is.element(input$Graphs,c("Sample","Describe","Infer","Likelihood")))
+     updateTabsetPanel(session, "Graphs", selected = "Sample")
+    if (!is.element(input$Reports,c("Sample","Describe","Infer","Likelihood")))
+        updateTabsetPanel(session, "Reports",
                         selected = "Sample")
-    }
   }
 }
 )
 
+# if we are analysing actual data and press the new sample button
+# then we do a resample of the data
+doResample<-FALSE
 whichAnalysisSample<-observeEvent(input$EvidencenewSample,{
-  applyingAnalysis<<-FALSE
+  doResample<<-TRUE
 },priority=100)
 whichAnalysisApply<-observeEvent(input$EvidenceHypothesisApply,{
-  applyingAnalysis<<-TRUE
+  doResample<<-FALSE
 },priority=100)
 
 # single sample calculations
-doSampleAnalysis<-function(IV,IV2,DV,effect,design,evidence){
+doSampleAnalysis<-function(){
   if (debug) debugPrint(". doSampleAnalysis")
-  if (IV$type=="Ordinal") {
-    if (warnOrd==FALSE) {
-      hmm("Ordinal IV will be treated as Interval.")
-      warnOrd<<-TRUE
-    }
-  }
-  if (!is.null(IV2)) {
-    if (IV2$type=="Ordinal") {
+  
+    if (!is.null(braw.def$hypothesis$IV2) && (braw.def$hypothesis$IV$type=="Ordinal" || braw.def$hypothesis$IV2$type=="Ordinal")) {
       if (warnOrd==FALSE) {
-        hmm("Ordinal IV2 will be treated as Interval.")
+        hmm("Ordinal IVs will be treated as Interval")
         warnOrd<<-TRUE
       }
     }
-  }
-  result<-runSimulation(IV,IV2,DV,effect,design,evidence,FALSE,onlyAnalysis,oldResult)
+  if (!onlyAnalysis) doSample()
+  result<-doAnalysis()
   if (debug) debugPrint(". doSampleAnalysis - exit")
   
   result
@@ -62,34 +58,31 @@ doSampleAnalysis<-function(IV,IV2,DV,effect,design,evidence){
 
 # eventReactive wrapper
 sampleAnalysis<-eventReactive(c(input$EvidenceHypothesisApply,input$EvidencenewSample,
-                                input$Welch,input$Transform,input$evidenceCaseOrder,input$analysisType,input$dataType,input$rInteractionOn),{
-  if (any(input$EvidenceHypothesisApply,input$EvidencenewSample)>0){
-    validSample<<-TRUE
-    IV<-updateIV()
-    IV2<-updateIV2()
-    DV<-updateDV()
+                                input$Welch,input$Transform,input$evidenceCaseOrder,
+                                input$analysisType,input$dataType,input$rInteractionOn,
+                                input$world_distr,input$world_distr_k,input$world_distr_rz,input$world_distr_Nullp
+                                ),{
+  if (any(c(input$EvidenceHypothesisApply,input$EvidencenewSample)>0)){
     
-    effect<-updateEffect()
-    design<-updateDesign()
-    evidence<-updateEvidence()
+    assign("hypothesis",updateHypothesis(),braw.def)
+    assign("design",updateDesign(),braw.def)
+    assign("evidence",updateEvidence(),braw.def)
 
-    showNotification("Sample: starting",id="counting",duration=Inf,closeButton=FALSE,type="message")
-    oldShortHand<-shortHand
-    shortHand<<-FALSE
-    result<-doSampleAnalysis(IV,IV2,DV,effect,design,evidence)
-    shortHand<-oldShortHand
-    ResultHistory<<-result$ResultHistory
-    
+    if (switches$showProgress)
+      showNotification("Sample: starting",id="counting",duration=Inf,closeButton=FALSE,type="message")
+    result<-doSampleAnalysis()
+
     # set the result into likelihood: populations
     if (!is.na(result$rIV)) {
       updateNumericInput(session,"possiblePSampRho",value=result$rIV)
       updateNumericInput(session,"possibleSampRho",value=result$rIV)
     }
-    removeNotification(id = "counting")
+    if (switches$showProgress)  removeNotification(id = "counting")
+    
   } else {
     result<-NULL
   }
-  result
+  return(result)
 })
 
 
@@ -97,49 +90,26 @@ sampleAnalysis<-eventReactive(c(input$EvidenceHypothesisApply,input$EvidencenewS
 # single sample graph
 makeSampleGraph <- function () {
   doIt<-editVar$data
-  
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
-  
+
   # make the sample
-  result<<-sampleAnalysis()
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
-  oldResult<<-result
+  result<-sampleAnalysis()
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
   # draw the sample
-  g<-graphSample(IV,IV2,DV,effect,design,evidence,result)
+  g<-showSample(result)
   return(g)
 }
 
 # single descriptive graph
 makeDescriptiveGraph <- function(){
   doIt<-editVar$data
-  # doIt<-input$MVok
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
-  
+
   # make the sample
   result<-sampleAnalysis()
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
-  if (is.na(result$rIV)) {
-    validate("IV has no variability")
-    return(ggplot()+plotBlankTheme)
-  }
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
   # draw the description
-  g<-graphDescription(IV,IV2,DV,effect,design,evidence,result)
+  g<-showDescription(result)
   return(g)
 }
 
@@ -148,33 +118,40 @@ makeInferentialGraph <- function() {
   doit<-c(input$EvidenceInfer_type,input$evidenceTheory,
           input$Welch,input$Transform,input$evidenceCaseOrder,input$analysisType,input$dataType,input$rInteractionOn)
   doIt<-editVar$data
-  llrConsts<-c(input$llr1,input$llr2)
-  
-  # doIt<-input$MVok
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
   
   result<-sampleAnalysis()
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
-  # if (is.null(result)) {
-  #   result<-list(rIV=NA,effect=effect,design=design,evidence=evidence)
-  # }
-  if (is.na(result$rIV) && validSample) {
-    validate("IV has no variability")
-    return(ggplot()+plotBlankTheme)
-  }
+  showType<-input$EvidenceInfer_type
+  if (showType=="Custom") showType<-paste0(input$EvidenceInfer_par1,";",input$EvidenceInfer_par2)
   
-  result$showType<-evidence$showType
-  result$evidence$showTheory<-input$evidenceTheory
+  g<-showInference(result,showType=showType,dimension=input$EvidenceSingleDim,effectType=input$EvidenceEffect_type,showTheory=input$evidenceTheory)
+  return(g)
+}
+
+# single likelihood graph
+makeLikelihoodGraph <- function() {
+  doit<-c(input$evidenceTheory,input$Transform,
+          input$world_distr,input$world_distr_k,input$world_distr_rz,input$world_distr_Nullp,
+          input$Prior_distr,input$Prior_distr_k,input$Prior_distr_rz,input$Prior_distr_Nullp)
+doIt<-editVar$data
+
+  result<-sampleAnalysis()
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
-  g<-graphInference(IV,IV2,DV,effect,design,evidence,result,input$EvidenceInfer_type)
+  evidence<-updateEvidence()
+  g<-showPossible(
+    doPossible(
+      makePossible(
+        typePossible="Populations",
+        targetSample<-result$rIV,
+        hypothesis=updateHypothesis(),design=updateDesign(),
+        UsePrior=input$likelihoodUsePrior,
+        prior=evidence$prior
+        )
+      ),
+    cutaway=input$possible_cutaway
+    )
   return(g)
 }
 
@@ -202,6 +179,14 @@ output$InferentialPlot <- renderPlot({
   g
 })
 
+output$LikelihoodPlot <- renderPlot({
+  if (debug) debugPrint("LikelihoodPlot")
+  doIt<-editVar$data
+  g<-makeLikelihoodGraph()
+  if (debug) debugPrint("LikelihoodPlot - exit")
+  g
+})
+
 output$SamplePlot1 <- renderPlot({
   if (debug) debugPrint("SamplePlot")
   doIt<-editVar$data
@@ -226,80 +211,73 @@ output$InferentialPlot1 <- renderPlot({
   g
 })
 
+output$LikelihoodPlot1 <- renderPlot({
+  if (debug) debugPrint("LikelihoodPlot")
+  doIt<-editVar$data
+  g<-makeLikelihoodGraph()
+  if (debug) debugPrint("LikelihoodPlot - exit")
+  g
+})
+
 # SINGLE reports    
 # single sample report
 makeSampleReport <- function()  {
-  
   doIt<-editVar$data
-  # doIt<-input$MVok
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  
+
   result<-sampleAnalysis()        
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
-  rpt<-reportSample(IV,IV2,DV,design,result)
-  reportPlot(rpt$outputText,rpt$nc,rpt$nr)        
+  g<-reportSample(result)
+  g
 }
 
 # single descriptive report
 makeDescriptiveReport <- function()  {
   doIt<-c(editVar$data,input$input$evidenceCaseOrder,input$rInteractionOn,input$dataType)
-  # doIt<-input$MVok
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
-  
+
   result<-sampleAnalysis()
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
-  if (is.na(result$rIV)) {
-    validate("IV has no variability")
-    return(ggplot()+plotBlankTheme)
-  }
-  result$showType<-evidence$showType
-  
-  rpt<-reportDescription(IV,IV2,DV,evidence,result)
-  reportPlot(rpt$outputText,rpt$nc,rpt$nr)        
-  
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
+
+  g<-reportDescription(result)
+  g
 }
 
 # single inferential report
 makeInferentialReport <- function()  {
   doIt<-c(editVar$data,input$Welch,input$Transform,input$evidenceCaseOrder,input$analysisType,input$dataType,input$rInteractionOn)
-  llrConsts<-c(input$llr1,input$llr2)
-  
-  # doIt<-input$MVok
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
   
   result<-sampleAnalysis()
-  if (is.null(result) ||  !validSample)  {return(ggplot()+plotBlankTheme)}
-  if (is.na(result$rIV)) {
-    validate("IV has no variability")
-    return(ggplot()+plotBlankTheme)
-  }
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
   
-  result$showType<-evidence$showType
-  rpt<-reportInference(IV,IV2,DV,effect,evidence,result)        
-  reportPlot(rpt$outputText,rpt$nc,rpt$nr)        
-  
+  g<-reportInference(result,analysisType = input$analysisType)        
+  g
 }
+
+# single likelihood report
+makeLikelihoodReport <- function() {
+  doit<-c(input$evidenceTheory,input$Transform,
+          input$world_distr,input$world_distr_k,input$world_distr_rz,input$world_distr_Nullp,
+          input$Prior_distr,input$Prior_distr_k,input$Prior_distr_rz,input$Prior_distr_Nullp)
+  doIt<-editVar$data
+  
+  result<-sampleAnalysis()
+  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
+  
+  evidence<-updateEvidence()
+  g<-reportLikelihood(
+    doPossible(
+      makePossible(
+        typePossible="Populations",
+        targetSample<-result$rIV,
+        hypothesis=updateHypothesis(),design=updateDesign(),
+        UsePrior=input$likelihoodUsePrior,
+        prior=evidence$prior
+      )
+    )
+  )
+  return(g)
+}
+
 
 output$SampleReport <- renderPlot({
   if (debug) debugPrint("SampleReport")
@@ -325,6 +303,14 @@ output$InferentialReport <- renderPlot({
   g
 })
 
+output$LikelihoodReport <- renderPlot({
+  if (debug) debugPrint("InferentialReport")
+  doIt<-editVar$data
+  g<-makeLikelihoodReport()
+  if (debug) debugPrint("InferentialReport - exit")
+  g
+})
+
 output$SampleReport1 <- renderPlot({
   if (debug) debugPrint("SampleReport")
   doIt<-editVar$data
@@ -345,6 +331,14 @@ output$InferentialReport1 <- renderPlot({
   if (debug) debugPrint("InferentialReport")
   doIt<-editVar$data
   g<-makeInferentialReport()
+  if (debug) debugPrint("InferentialReport - exit")
+  g
+})
+
+output$LikelihoodReport1 <- renderPlot({
+  if (debug) debugPrint("InferentialReport")
+  doIt<-editVar$data
+  g<-makeLikelihoodReport()
   if (debug) debugPrint("InferentialReport - exit")
   g
 })

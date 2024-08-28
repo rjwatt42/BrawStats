@@ -14,16 +14,18 @@ MainReports <- function() {
                         tabPanel("Infer",      
                                  style="margin:0px;padding:0px;",
                                  plotOutput("InferentialReport")
-                                 )
+                        ),
+                        tabPanel("Likelihood",      
+                                 style="margin:0px;padding:0px;",
+                                 plotOutput("LikelihoodReport")
+                        )
                         ,tabPanel("Expect",value="Expect",   
                                   style="margin:0px;padding:0px;",
                                   plotOutput("ExpectedReport"))
-                        ,metaGraphPanel()
                         ,tabPanel("Explore",value="Explore",
                                   style="margin:0px;padding:0px;",
                                   plotOutput("ExploreReport")
                                   )
-                        ,possibleReportPanel()
             )
   )
 }
@@ -44,17 +46,19 @@ MainReports1 <- function() {
                         tabPanel("Infer",      
                                  style="margin:0px;padding:0px;",
                                  plotOutput("InferentialReport1")
-                                 )
+                        ),
+                        tabPanel("Likelihood",      
+                                 style="margin:0px;padding:0px;",
+                                 plotOutput("likelihoodReportPanel1")
+                        )
                         ,tabPanel("Expect",value="Expect",   
                                   style="margin:0px;padding:0px;",
                                   plotOutput("ExpectedReport1")
                                   )
-                        ,metaGraphPanel()
                         ,tabPanel("Explore",value="Explore",
                                   style="margin:0px;padding:0px;",
                                   plotOutput("ExploreReport1")
                                   )
-                        ,possibleReportPanel()
             )
   )
 }

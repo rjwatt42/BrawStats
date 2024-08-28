@@ -2,6 +2,12 @@ source("uiEffect.R")
 source("uiWorld.R")
 source("uiQuickHyp.R")
 
+varTypes<- c("Interval" = "Interval",
+             "Ordinal" = "Ordinal",
+             "Categorical" = "Categorical"
+)
+varChoices<- names(braw.env$variables)
+
 HypothesisTab <-
   
   wellPanel(id="HypothesisTabset",
@@ -16,12 +22,12 @@ HypothesisTab <-
                         # variables tab
                         tabPanel("Variables",value="Variables",
                                  style = paste("background: ",subpanelcolours$hypothesisC), 
-                                 conditionalPanel(condition="input.Using!='OK'",
+                                 conditionalPanel(condition="input.Using!='Data'",
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "40%", selectInput("Using", label = NULL,
-                                                                                                  choices=c("Simulations"="Simulations","OK"="OK"),
-                                                                                                  selected="OK",
+                                                                                                  choices=c("Simulations"="Simulations","Data"="Data"),
+                                                                                                  selected="Data",
                                                                                                   selectize=FALSE
                                                                )),
                                                                tags$td(width = "60%", tags$div(style = localStyle, " ")),
@@ -30,43 +36,243 @@ HypothesisTab <-
                                  ),
                                  tags$table(width = "100%",class="myTable",
                                             tags$tr(
-                                              tags$td(width = "5%", tags$div(style = localStyle, "IV:")),
-                                              tags$td(width = "45%", selectInput("IVchoice", label = NULL,
-                                                                                 choices=IV$name,
-                                                                                 selected=IV$name,
+                                              tags$td(width = "10%", tags$div(style = localStyle, "IV:")),
+                                              tags$td(width = "60%", selectInput("IVchoice", label = NULL,
+                                                                                 choices=varChoices,
+                                                                                 selected=braw.def$IV$name,
                                                                                  selectize=FALSE
                                               )),
-                                              tags$td(width = "25%", actionButton("editIV","Edit IV")),
-                                              tags$td(width = "25%", tags$div(style = localStyle, " ")),
+                                              tags$td(width = "20%", tags$div(style = localStyle, "edit")),
+                                              tags$td(width = "5%", checkboxInput("editIV","")),
                                               tags$td(width = "5%", tags$div(style = localStyle, " ")),
-                                              tags$td(width = "10%", actionButton("inspectIV","i")),
+                                              # tags$td(width = "10%", actionButton("inspectIV","i")),
+                                            )),
+                                 conditionalPanel(condition="input.editIV",
+                                                  tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "30%", tags$div(style = localStyle, "Name:")),
+                                              tags$td(width = "70%", textInput("IVname", value = braw.def$IV$name, label = NULL))
                                             ),
                                             tags$tr(
-                                              tags$td(width = "5%", tags$div(style = localStyle, "IV2:")),
-                                              tags$td(width = "45%", selectInput("IV2choice", label = NULL,
-                                                                                 choices=IV2$name,
-                                                                                 selected=IV2$name,
-                                                                                 selectize=FALSE
-                                              )),
-                                              tags$td(width = "25%", 
-                                                      conditionalPanel(condition = "input.IV2choice != 'none'",
-                                                                       actionButton("editIV2","Edit IV2")
-                                                      )),
-                                              tags$td(width = "5%", tags$div(style = localStyle, " "))
+                                              tags$td(width = "30%", div(style = localStyle, "Type:")),
+                                              tags$td(width = "70%", 
+                                                      selectInput("IVtype", label= NULL,
+                                                                  varTypes,selected=braw.def$IV$type,
+                                                                  selectize=FALSE
+                                                      )
+                                              )
+                                            ))),
+                                 conditionalPanel(condition="input.editIV && input.IVtype == 'Interval'",
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Mean:")),
+                                                    tags$td(width = "20%", numericInput("IVmu", value = braw.def$IV$mu, label = NULL)),
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Sd:")),
+                                                    tags$td(width = "20%", numericInput("IVsd", value = braw.def$IV$sd, label = NULL))
                                             ),
                                             tags$tr(
-                                              tags$td(width = "5%", tags$div(style = localStyle, "DV:")),
-                                              tags$td(width = "45%", selectInput("DVchoice", label = NULL,
-                                                                                 choices=DV$name,
-                                                                                 selected=DV$name,
-                                                                                 selectize=FALSE
-                                              )),
-                                              tags$td(width = "25%", actionButton("editDV","Edit DV")),
-                                              tags$td(width = "25%", tags$div(style = localStyle, " ")),
-                                              tags$td(width = "5%", tags$div(style = localStyle, " ")),
-                                              tags$td(width = "10%", actionButton("inspectDV","i")),
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Skew:")),
+                                                    tags$td(width = "20%",  numericInput("IVskew", value = braw.def$IV$skew, step=0.1, label = NULL)),
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Kurtosis:")),
+                                                    tags$td(width = "20%",  numericInput("IVkurt", value = braw.def$IV$kurtosis, step=0.1, label = NULL))
+                                            ),
+                                 ),
+                                 ),
+                                 conditionalPanel(condition="input.editIV && input.IVtype == 'Ordinal'",
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "No levels:")),
+                                                    tags$td(width = "20%", numericInput("IVnlevs", value = braw.def$IV$nlevs, label = NULL,step=1,min=2)),
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "IQR:")),
+                                                    tags$td(width = "20%", numericInput("IViqr", value = braw.def$IV$iqr, label = NULL,step=0.5)),
+                                            ),
+                                 ),
+                                 ),
+                                 conditionalPanel(condition="input.editIV && input.IVtype == 'Categorical'",
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "No cases:")),
+                                                    tags$td(width = "20%", numericInput("IVncats", value = braw.def$IV$ncats, label = NULL,step=1,min=2)),
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Proportions:")),
+                                                    tags$td(width = "20%", textInput("IVprop", value = braw.def$IV$proportions, label = NULL)),
+                                                    # tags$td(width = "10%",  tags$div(style = localStyle, " "))
+                                            ),
+                                 ),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                                    tags$td(width = "30%",  tags$div(style = localStyle, "Cases:")),
+                                                    tags$td(width = "60%", textInput("IVcases", value = braw.def$IV$cases, label = NULL)),
+                                                    tags$td(width = "10%",  tags$div(style = localStyle, " "))
                                             ),
                                  )
+                                 ),
+                                 conditionalPanel(condition="input.editIV",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "90%", tags$div(style = localStyle, "")),
+                                                               tags$td(width = "10%", actionButton("inspectIV","i")),
+                                                             )
+                                                  )),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "10%", tags$div(style = localStyle, "IV2:")),
+                                              tags$td(width = "60%", selectInput("IV2choice", label = NULL,
+                                                                                 choices=c("none",varChoices),
+                                                                                 selected=braw.def$IV2$name,
+                                                                                 selectize=FALSE
+                                              )),
+                                              conditionalPanel(condition = "input.IV2choice != 'none'",
+                                                                            tags$td(width = "20%", tags$div(id="editIV2T",style = localStyle, "edit")),
+                                                               tags$td(width = "5%", checkboxInput("editIV2","")),
+                                                               tags$td(width = "5%", tags$div(style = localStyle, " ")),
+                                              )
+                                            ),
+                                 ),
+                                 conditionalPanel(condition="input.editIV2",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%", tags$div(style = localStyle, "Name:")),
+                                                               tags$td(width = "70%", textInput("IV2name", value = braw.def$IV2$name, label = NULL))
+                                                             ),
+                                                             tags$tr(
+                                                               tags$td(width = "30%", div(style = localStyle, "Type:")),
+                                                               tags$td(width = "70%", 
+                                                                       selectInput("IV2type", label= NULL,
+                                                                                   varTypes,selected=braw.def$IV2$type,
+                                                                                   selectize=FALSE
+                                                                       )
+                                                               )
+                                                             ))),
+                                 conditionalPanel(condition="input.editIV2 && input.IV2type == 'Interval'",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Mean:")),
+                                                               tags$td(width = "20%", numericInput("IV2mu", value = braw.def$IV2$mu, label = NULL)),
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Sd:")),
+                                                               tags$td(width = "20%", numericInput("IV2sd", value = braw.def$IV2$sd, label = NULL))
+                                                             ),
+                                                             tags$tr(
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Skew:")),
+                                                               tags$td(width = "20%",  numericInput("IV2skew", value = braw.def$IV2$skew, step=0.1, label = NULL)),
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Kurtosis:")),
+                                                               tags$td(width = "20%",  numericInput("IV2kurt", value = braw.def$IV2$kurtosis, step=0.1, label = NULL))
+                                                             ),
+                                                  ),
+                                 ),
+                                 conditionalPanel(condition="input.editIV2 && input.IV2type == 'Ordinal'",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "No levels:")),
+                                                               tags$td(width = "20%", numericInput("IV2nlevs", value = braw.def$IV2$nlevs, label = NULL,step=1,min=2)),
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "IQR:")),
+                                                               tags$td(width = "20%", numericInput("IV2iqr", value = braw.def$IV2$iqr, label = NULL,step=0.5)),
+                                                             ),
+                                                  ),
+                                 ),
+                                 conditionalPanel(condition="input.editIV2 && input.IV2type == 'Categorical'",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "No cases:")),
+                                                               tags$td(width = "20%", numericInput("IV2ncats", value = braw.def$IV2$ncats, label = NULL,step=1,min=2)),
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Proportions:")),
+                                                               tags$td(width = "20%", textInput("IV2prop", value = braw.def$IV2$proportions, label = NULL)),
+                                                               # tags$td(width = "10%",  tags$div(style = localStyle, " "))
+                                                             ),
+                                                  ),
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%",  tags$div(style = localStyle, "Cases:")),
+                                                               tags$td(width = "60%", textInput("IV2cases", value = braw.def$IV2$cases, label = NULL)),
+                                                               tags$td(width = "10%",  tags$div(style = localStyle, " "))
+                                                             ),
+                                                  )
+                                 ),
+                                 conditionalPanel(condition="input.editIV2",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "90%", tags$div(style = localStyle, "")),
+                                                               tags$td(width = "10%", actionButton("inspectIV2","i")),
+                                                             )
+                                 )),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "10%", tags$div(style = localStyle, "DV:")),
+                                              tags$td(width = "60%", selectInput("DVchoice", label = NULL,
+                                                                                 choices=varChoices,
+                                                                                 selected=braw.def$DV$name,
+                                                                                 selectize=FALSE
+                                              )),
+                                              tags$td(width = "20%", tags$div(style = localStyle, "edit")),
+                                              tags$td(width = "5%", checkboxInput("editDV","")),
+                                              tags$td(width = "5%", tags$div(style = localStyle, " ")),
+                                            ),
+                                 ),
+                                 conditionalPanel(condition="input.editDV",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "30%", tags$div(style = localStyle, "Name:")),
+                                                               tags$td(width = "70%", textInput("DVname", value = braw.def$DV$name, label = NULL))
+                                                             ),
+                                                             tags$tr(
+                                                               tags$td(width = "30%", div(style = localStyle, "Type:")),
+                                                               tags$td(width = "70%", 
+                                                                       selectInput("DVtype", label= NULL,
+                                                                                   varTypes,selected=braw.def$DV$type,
+                                                                                   selectize=FALSE
+                                                                       )
+                                                               )
+                                                             ))),
+                                 conditionalPanel(condition="input.editDV && input.DVtype == 'Interval'",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Mean:")),
+                                                                     tags$td(width = "20%", numericInput("DVmu", value = braw.def$DV$mu, label = NULL)),
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Sd:")),
+                                                                     tags$td(width = "20%", numericInput("DVsd", value = braw.def$DV$sd, label = NULL))
+                                                             ),
+                                                             tags$tr(
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Skew:")),
+                                                                     tags$td(width = "20%",  numericInput("DVskew", value = braw.def$DV$skew, step=0.1, label = NULL)),
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Kurtosis:")),
+                                                                     tags$td(width = "20%",  numericInput("DVkurt", value = braw.def$DV$kurtosis, step=0.1, label = NULL))
+                                                             ),
+                                                  ),
+                                 ),
+                                 conditionalPanel(condition="input.editDV && input.DVtype == 'Ordinal'",
+                                                  tags$table(id="IVOrdVal",width = "100%",class="myTable",
+                                                             tags$tr(
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "No levels:")),
+                                                                     tags$td(width = "20%", numericInput("DVnlevs", value = braw.def$DV$nlevs, label = NULL,step=1,min=2)),
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "IQR:")),
+                                                                     tags$td(width = "20%", numericInput("DViqr", value = braw.def$DV$iqr, label = NULL,step=0.5))
+                                                             ),
+                                                  ),
+                                 ),
+                                 conditionalPanel(condition="input.editDV && input.DVtype == 'Categorical'",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "No cases:")),
+                                                                     tags$td(width = "20%", numericInput("DVncats", value = braw.def$DV$ncats, label = NULL,step=1,min=2)),
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Proportions:")),
+                                                                     tags$td(width = "20%", textInput("DVprop", value = braw.def$DV$proportions, label = NULL)),
+                                                                     # tags$td(width = "10%",  tags$div(style = localStyle, " "))
+                                                             ),
+                                                  ),
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                                     tags$td(width = "30%",  tags$div(style = localStyle, "Cases:")),
+                                                                     tags$td(width = "60%", textInput("DVcases", value = braw.def$DV$cases, label = NULL)),
+                                                                     tags$td(width = "10%",  tags$div(style = localStyle, " "))
+                                                             ),
+                                                  )
+                                 ),
+                                 conditionalPanel(condition="input.editDV",
+                                                  tags$table(width = "100%",class="myTable",
+                                                             tags$tr(
+                                                               tags$td(width = "90%", tags$div(style = localStyle, "")),
+                                                               tags$td(width = "10%", actionButton("inspectDV","i")),
+                                                             )
+                                                  )),
                         ),
                         
                         # prediction tab
@@ -81,22 +287,12 @@ HypothesisTab <-
                         # options tab
                         tabPanel("#",
                                  style = paste("background: ",subpanelcolours$hypothesisC),
-                                 conditionalPanel(condition="input.Using=='Data'",
-                                                  tags$table(width = "100%",class="myTable",
-                                                             tags$tr(
-                                                               tags$td(width = "45%", tags$div(style = localPlainStyle, "Allow Resampling:")),
-                                                               tags$td(width = "30%", 
-                                                                       checkboxInput("AllowResampling",label=NULL,value=switches$doBootstrap),
-                                                               ),
-                                                               tags$td(width = "25%")                                        )
-                                                  )
-                                 ),
-                                 conditionalPanel(condition="input.Using!='Data'",
+                                 # conditionalPanel(condition="input.Using!='Data'",
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "45%", tags$div(style = localPlainStyle, "Heteroscedasticity:")),
                                                                tags$td(width = "30%", 
-                                                                       numericInput("Heteroscedasticity",label=NULL,value=effect$Heteroscedasticity,min=-2, max=2, step=0.1),
+                                                                       numericInput("Heteroscedasticity",label=NULL,value=braw.def$effect$Heteroscedasticity,min=-2, max=2, step=0.1),
                                                                ),
                                                                tags$td(width = "25%")
                                                              ),
@@ -104,13 +300,13 @@ HypothesisTab <-
                                                                tags$td(width = "45%", tags$div(style = localPlainStyle, "Residuals:")),
                                                                tags$td(width = "30%", 
                                                                        selectInput("ResidDistr",label=NULL,
-                                                                                   choices=list("normal"="normal","skewed","uniform"="uniform","Cauchy"="Cauchy","t(3)"="t(3)"),selected=effect$ResidDistr,selectize=FALSE),
+                                                                                   choices=list("normal"="normal","skewed","uniform"="uniform","Cauchy"="Cauchy","t(3)"="t(3)"),selected=braw.def$effect$ResidDistr,selectize=FALSE),
                                                                ),
                                                                tags$td(width = "25%")
                                                              )
                                                   )
-                                 ),
-                                 quickHypotheses
+                                 # )
+                                 ,quickHypotheses
                         ),
                         # help tab
                         tabPanel(helpChar,value="?",

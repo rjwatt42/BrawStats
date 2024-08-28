@@ -1,66 +1,6 @@
 ##################################################################################    
 #  IMPORT/EXPORT data and workspace
 
-getNewVariables<-function(raw_data,header=c()){
-  keep<-!apply(is.na(raw_data),2,all)
-  raw_data<-raw_data[,keep]
-  
-  keep<-!apply(is.na(raw_data),1,all)
-  raw_data<-raw_data[keep,]
-  
-  newVariables<-readSample(raw_data,input$ImportOrdinals,input$MaxOrdinal,header)
-  
-  # save the current set of variables
-  defaultVariables<<-variables
-  # store the variables in global workspace
-  if (mergeVariables){
-    variables<<-rbind(newVariables,variables)
-  } else{
-    variables<<-newVariables
-    simData<<-FALSE
-  }
-  changeUI2Data()
-}    
-
-# respond to file selection by getting sheet names
-inspectDataFile<-observeEvent(input$dataInputFile, {
-  sheet_names<-excel_sheets(input$dataInputFile$datapath)
-  updateSelectInput(session, "dataInputSheet", choices = sheet_names)
-  # get the raw data
-  if (length(sheet_names)<=1){
-    mergeVariables<<-FALSE
-    raw_data<-read_excel(input$dataInputFile$datapath)
-    if (nrow(raw_data)>0 && ncol(raw_data)>0)
-      getNewVariables(raw_data)
-  }
-})
-
-# data input    
-importDataFile<-observeEvent(input$dataInputFileLoad, {
-  mergeVariables<<-FALSE
-  # get the raw data
-  if (is.character(input$dataInputFile$datapath)) {
-    if (isempty(input$dataInputSheet)) {
-      raw_data<-read_excel(input$dataInputFile$datapath)
-    } else {
-      raw_data<-read_excel(input$dataInputFile$datapath,sheet = input$dataInputSheet)
-    }
-    if (nrow(raw_data)>0 && ncol(raw_data)>0)
-      getNewVariables(raw_data)
-  }
-})
-
-readCLipDataFile<-observeEvent(input$dPaste, {
-  mergeVariables<<-FALSE
-  # get the raw data
-  raw_h1<-read_clip()
-  header<-strsplit(raw_h1[1],"\t")[[1]]
-  raw_data<-read_clip_tbl()
-  # read_clip_tbl doesn't like some characters like | and =
-  colnames(raw_data)<-header
-  if (nrow(raw_data)>0 && ncol(raw_data)>0)
-    getNewVariables(raw_data)
-})
 
 exportData<-function() {
   IV<-updateIV()
@@ -285,15 +225,4 @@ importWSClip<-observeEvent(input$wsPaste, {
   }
 })
 
-batchfiles<-observeEvent(input$batchFileRun,{
-  IV<-updateIV()
-  IV2<-updateIV2()
-  DV<-updateDV()
-  
-  effect<-updateEffect()
-  design<-updateDesign()
-  evidence<-updateEvidence()
-  runBatchFiles(IV,IV2,DV,effect,design,evidence,input)
-  
-})
 ##################################################################################    

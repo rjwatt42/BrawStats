@@ -1,8 +1,6 @@
 ####################################
 #KEYBOARD: capture keyboard events
 
-source("extras.R")
-
 ascii<-function(ch) strtoi(charToRaw(toupper(ch)),16L)
 
 if (switches$doKeys) {
@@ -20,16 +18,6 @@ if (switches$doKeys) {
     if (input$keypress==ascii("w") && controlKeyOn && shiftKeyOn){
       was<-input$WhiteGraphs
       updateCheckboxInput(session,"WhiteGraphs",value=!was)
-    }
-    
-    # control-m - add in meta-analysis
-    if (input$keypress==ascii("m") && controlKeyOn){
-      switches$doMetaAnalysis<<-TRUE
-      insertTab("Evidence",metaPanel(),"Multiple","after",select=FALSE,session)
-      insertTab("Graphs",metaGraphPanel(),"Expect","after",select=FALSE,session)
-      insertTab("Reports",metaReportPanel(),"Expect","after",select=FALSE,session)
-      insertTab("ExploreTab",exploreMeta(),"Design","after",select=FALSE,session)
-      insertTab("FileTab",metaFilePanel(),"Data","after",select=FALSE,session)
     }
     
     if (input$keypress==ascii("d") && controlKeyOn){
@@ -74,16 +62,14 @@ if (switches$doKeys) {
       write_clip(data,allow_non_interactive = TRUE)
     }
     
-    if (pPlus) {v<-0.26}
-    else       {v<-0.74}
     # control-shift-p set world to model psych
     if (input$keypress==ascii("p") && controlKeyOn){
-      loadExtras(session)
+      loadExtras(session,input)
       updateCheckboxInput(session,"world_on",value=TRUE)
       updateSelectInput(session,"world_distr",selected="Exp")
       updateSelectInput(session,"world_distr_rz",selected="z")
       updateNumericInput(session,"world_distr_k",value=0.332)
-      updateNumericInput(session,"world_distr_Nullp",value=v)
+      updateNumericInput(session,"world_distr_Nullp",value=0.74)
       updateTabsetPanel(session,"HypothesisDiagram",selected="World")
       
       if (shiftKeyOn) {
@@ -95,7 +81,7 @@ if (switches$doKeys) {
     }
     
     if (input$keypress==ascii("G") && controlKeyOn){
-      loadExtras(session)
+      loadExtras(session,input)
       updateCheckboxInput(session,"world_on",value=TRUE)
       updateSelectInput(session,"world_distr",selected="Gauss")
       updateSelectInput(session,"world_distr_rz",selected="z")
@@ -114,7 +100,7 @@ if (switches$doKeys) {
     # control-l set shortHand to TRUE
     if (input$keypress==ascii("l") && controlKeyOn){
       updateCheckboxInput(session,"shortHand",value=!input$shortHand)
-      updateSelectInput(session,"EvidenceExpected_length",selected="1000")
+      updateSelectInput(session,"EvidenceExpected_length",value="1000")
       updateSelectInput(session,"Explore_lengthH",selected="100")
       updateSelectInput(session,"Explore_lengthD",selected="100")
     }

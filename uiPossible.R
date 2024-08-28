@@ -23,8 +23,7 @@ if (switches$doWorlds) {
 
 if (switches$doPossiblePower) {
   possibleShows<-c("Normal" = "Normal",
-                   "Inverse" = "Inverse",
-                   "Power" = "Power")
+                   "Inverse" = "Inverse")
 } else {
   possibleShows<-c("Normal" = "Normal",
     "Inverse" = "Inverse")
@@ -46,10 +45,10 @@ PossibleTab <-
                          tags$table(width = "100%",class="myTable",style=paste("margin:0px;padding:0px;margin-left:-20px;margin-right:-20px;"),
                                     tags$tr(
                                       tags$td(width = "40%", tags$div(style = localStyle, "Target Sample:")),
-                                      tags$td(width = "20%", numericInput("possibleSampRho", label=NULL,min=-1,max=1, step=0.1,value=possible$targetSample)),
+                                      tags$td(width = "20%", numericInput("possibleSampRho", label=NULL,min=-1,max=1, step=0.1,value=braw.def$possible$targetSample)),
                                       tags$td(width = "15%",tags$div(style = localStyle, "from:")),
                                       tags$td(width = "25%",selectInput("possibleUseSource",label=NULL,
-                                                                        choices=source2,selected=possible$UseSource,
+                                                                        choices=source2,selected=braw.def$possible$UseSource,
                                                                         selectize=FALSE)
                                       ),
                                     ),
@@ -57,9 +56,9 @@ PossibleTab <-
                          tags$table(width = "100%",class="myTable",style=paste("margin:0px;padding:0px;margin-left:-20px;margin-right:-20px;"),
                                     tags$tr(
                                       tags$td(width = "35%", tags$div(style = localStyle, "cut:")),
-                                      tags$td(width = "15%", checkboxInput("possible_cutaway",label=NULL,value=possible$cutaway)),
+                                      tags$td(width = "15%", checkboxInput("possible_cutaway",label=NULL,value=FALSE)),
                                       tags$td(width = "35%", tags$div(style = localStyle, "Sig Only:")),
-                                      tags$td(width = "15%", checkboxInput("possible_sigonly",label=NULL,value=possible$sigOnly))
+                                      tags$td(width = "15%", checkboxInput("possible_sigonly",label=NULL,value=FALSE))
                                     )
                          ),
                          tags$table(width = "100%",class="myTable",
@@ -70,8 +69,8 @@ PossibleTab <-
                                                           SpossibleLengthChoices,selectize=FALSE)
                                       ),
                                       tags$td(width = "20%", tags$div(style = localStyle, "Append:")),
-                                      tags$td(width = "10%", checkboxInput("possible_append", label=NULL,value=possible$appendSim)),
-                                      tags$td(width = "10%", actionButton("possible_run", "Run"))
+                                      tags$td(width = "10%", checkboxInput("possible_append", label=NULL,value=FALSE)),
+                                      tags$td(width = "10%", actionButton("possible_run", startLabel))
                                     )
                          ),
               ),
@@ -80,10 +79,10 @@ PossibleTab <-
                          tags$table(width = "100%",class="myTable",style=paste("margin:0px;padding:0px;margin-left:-20px;margin-right:-20px;"),
                                     tags$tr(
                                       tags$td(width = "40%", tags$div(style = localStyle, "Target Sample:")),
-                                      tags$td(width = "20%", numericInput("possiblePSampRho", label=NULL,min=-1,max=1, step=0.05,value=possible$targetSample)),
+                                      tags$td(width = "20%", numericInput("possiblePSampRho", label=NULL,min=-1,max=1, step=0.05,value=braw.def$possible$targetSample)),
                                       tags$td(width = "15%",tags$div(style = localStyle, "prior:")),
-                                      tags$td(width = "25%",selectInput("possibleUsePrior",label=NULL,
-                                                                        choices=source1,selected=possible$UsePrior,
+                                      tags$td(width = "25%",selectInput("likelihoodUsePrior",label=NULL,
+                                                                        choices=source1,selected=braw.def$possible$UsePrior,
                                                                         selectize=FALSE)
                                               ),
                                     )
@@ -96,8 +95,8 @@ PossibleTab <-
                                                           PpossibleLengthChoices,selectize=FALSE)
                                       ),
                                       tags$td(width = "20%", tags$div(style = localStyle, "Append:")),
-                                      tags$td(width = "10%", checkboxInput("possibleP_append", label=NULL,value=possible$appendSim)),
-                                      tags$td(width = "10%", actionButton("possibleP_run", "Run")),
+                                      tags$td(width = "10%", checkboxInput("possibleP_append", label=NULL,value=FALSE)),
+                                      tags$td(width = "10%", actionButton("possibleP_run", startLabel)),
                                     )
                          ),
               ),
@@ -114,11 +113,9 @@ PossibleTab <-
                          tags$table(width = "100%",class="myTable",
                                     tags$tr(
                                       tags$td(width = "20%", tags$div(style = localPlainStyle, "sim slice:")),
-                                      tags$td(width = "20%",numericInput("possibleSimSlice",label=NULL,value=possible$possibleSimSlice,max=0.2,min=0.0001,step=0.01)),
+                                      tags$td(width = "20%",numericInput("possibleSimSlice",label=NULL,value=braw.def$possible$simSlice,max=0.2,min=0.0001,step=0.01)),
                                       tags$td(width = "25%", tags$div(style = localPlainStyle, "correction:")),
-                                      tags$td(width = "10%",checkboxInput("possibleCorrection", value=possible$possibleCorrection, label=NULL)),
-                                      tags$td(width = "15%", tags$div(style = localPlainStyle, "HQ:")),
-                                      tags$td(width = "10%",checkboxInput("possibleHQ", value=possible$possibleHQ, label=NULL))
+                                      tags$td(width = "10%",checkboxInput("correction", value=braw.def$possible$correction, label=NULL))
                                     ),
                                     
                          ),
@@ -136,17 +133,17 @@ PossibleTab <-
                                       tags$td(width = "20%", 
                                               selectInput("possibleView", label=NULL,
                                                           c("3D" = "3D",
-                                                            "2D" = "2D"),selected=possible$view,selectize=FALSE)
+                                                            "2D" = "2D"),selected="3D",selectize=FALSE)
                                       ),
                                       tags$td(width = "15%", tags$div(style = localPlainStyle, "show:")),
                                       tags$td(width = "30%", 
                                               selectInput("possibleShow", label=NULL,
                                                           choices=possibleShows,
-                                                          selected=possible$show,selectize=FALSE)
+                                                          selectize=FALSE)
                                       ),
                                       tags$td(width = "15%", tags$div(style = localPlainStyle, "box:")),
                                       tags$td(width = "5%", 
-                                              checkboxInput("possibleBoxed", label=NULL,value=possible$boxed)
+                                              checkboxInput("possibleBoxed", label=NULL,value=FALSE)
                                               ),
                                     ),
                          ),
@@ -158,7 +155,7 @@ PossibleTab <-
                                                            min = -180,
                                                            max = 180,
                                                            step = 5,
-                                                           value = possible$azimuth)
+                                                           value = 60)
                                       ),
                                       tags$td(width = "15%", tags$div(style = localPlainStyle, "elev:")),
                                       tags$td(width = "20%", 
@@ -166,7 +163,7 @@ PossibleTab <-
                                                            min = 0,
                                                            max = 90,
                                                            step = 5,
-                                                           value = possible$elevation)
+                                                           value = 5)
                                       ),
                                       tags$td(width = "15%", tags$div(style = localPlainStyle, "range:")),
                                       tags$td(width = "15%", 
@@ -174,7 +171,7 @@ PossibleTab <-
                                                            min = 0,
                                                            max = 100,
                                                            step = 1,
-                                                           value = possible$range)
+                                                           value = 2)
                                       ),
                                     )
                          ),
@@ -182,7 +179,7 @@ PossibleTab <-
                                     tags$tr(
                                       tags$td(width = "50%", tags$div(style = localPlainStyle, "")),
                                       tags$td(width = "45%",tags$div(style = localPlainStyle, "show theory:")),
-                                      tags$td(width = "5%", checkboxInput("possibleTheory", value=possible$possibleTheory, label=NULL))
+                                      tags$td(width = "5%", checkboxInput("possibleTheory", value=TRUE, label=NULL))
                                     ),
                          )
               )
@@ -207,7 +204,7 @@ PossibleTab <-
                                                 tags$br(HTML('&emsp;'),HTML('&emsp;'),HTML('&emsp;'), '(high effect sizes are rare)'),
                                                 tags$br(HTML('&emsp;'), '2. choose whether to see theoretical distributions'),
                                                 tags$br(HTML('&emsp;'),HTML('&emsp;'),HTML('&emsp;'), '(these are idealized)'),
-                                                tags$br(HTML('&emsp;'), '3. press "Run"'),
+                                                tags$br(HTML('&emsp;'), paste0('3. press "',startLabel,'"')),
                                        ),
                                      )
                           ),

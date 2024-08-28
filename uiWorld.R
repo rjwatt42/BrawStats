@@ -7,7 +7,7 @@ worldPanel<-function(prefix="",asTable=FALSE,doAnyway=FALSE) {
                tags$tr(
                  tags$td(width = "40%", tags$div(style = localStyle, "World:")),
                  tags$td(width = "30%",
-                         checkboxInput(paste0(prefix, "world_on"), label=NULL, value=effect$world$worldOn)
+                         checkboxInput(paste0(prefix, "world_on"), label=NULL, value=braw.def$effect$world$worldOn)
                  ),
                  tags$td(width = "15%"),
                  tags$td(width = "15%")
@@ -17,19 +17,20 @@ worldPanel<-function(prefix="",asTable=FALSE,doAnyway=FALSE) {
                  tags$td(width = "30%",
                          selectInput(paste0(prefix, "world_distr"), label=NULL,
                                      c("Single" = "Single",
+                                       "Double" = "Double",
                                        "Uniform" = "Uniform",
                                        "Gauss"="Gauss",
                                        "Exp" = "Exp",
                                        ">"=">",
                                        "<"="<"),width="100%",
-                                     selected=effect$world$populationPDF,
+                                     selected=braw.def$effect$world$populationPDF,
                                      selectize=FALSE)
                  ),
                  tags$td(width = "15%",
                          selectInput(paste0(prefix,"world_distr_rz"), label=NULL,
                                      c("r" = "r",
                                        "z" = "z"),width="100%",
-                                     selected=effect$world$populationRZ,
+                                     selected=braw.def$effect$world$populationRZ,
                                      selectize=FALSE)
                  ),
                  tags$td(width = "15%",
@@ -38,16 +39,16 @@ worldPanel<-function(prefix="",asTable=FALSE,doAnyway=FALSE) {
                                       min = -1,
                                       max = 1,
                                       step = 0.05,
-                                      value = effect$world$populationPDFk)
+                                      value = braw.def$effect$world$populationPDFk)
                          )
                  )
                ),
                tags$tr(
-                 tags$td(width = "40%", tags$div(style = localStyle, pPlusLabel)),
-                 tags$td(width = "30%", numericInput(paste0(prefix, "world_distr_Nullp"), label=NULL,min=0,max=1, step=0.05,value=effect$world$populationNullp)),
+                 tags$td(width = "40%", tags$div(style = localStyle, braw.env$pPlusLabel)),
+                 tags$td(width = "30%", numericInput(paste0(prefix, "world_distr_Nullp"), label=NULL,min=0,max=1, step=0.05,value=braw.def$effect$world$populationNullp)),
                  tags$td(width = "15%", tags$div(style = localStyle, "abs:")),
                  tags$td(width = "15%",
-                   checkboxInput(paste0(prefix, "world_abs"), label=NULL, value=effect$world$worldAbs)
+                   checkboxInput(paste0(prefix, "world_abs"), label=NULL, value=braw.def$effect$world$worldAbs)
                  )
                )
     )

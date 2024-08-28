@@ -16,7 +16,7 @@ updateInspect<-function() {
 inspectVariable<-function(var) {
   inspectVar<<-var
   if (!simData) {
-    use<-which(variables$name==var$name)
+    use<-which(names(braw.env$variables)==var$name)
     inspectData<<-importedData[,use+1]
   } else {
     inspectData<<-c()

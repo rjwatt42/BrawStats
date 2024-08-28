@@ -8,7 +8,7 @@ replicationTab<-function(prefix="") {
                                                tags$tr(
                                                  tags$td(width = "20%", tags$div(style = localStyle, "Replication:")),
                                                  tags$td(width = "5%", 
-                                                         checkboxInput("sReplicationOn",label=NULL,value=design$sReplicationOn)
+                                                         checkboxInput("sReplicationOn",label=NULL,value=braw.def$design$Replication$On)
                                                  ),
                                                  tags$td(width = "25%"),
                                                  tags$td(width = "25%"),
@@ -21,7 +21,7 @@ replicationTab<-function(prefix="") {
                                                  tags$td(width = "30%", 
                                                          selectInput("sReplSigOnly",label=NULL,
                                                                      choices=c("any"="No","sig only"="Yes"),
-                                                                     selected=design$sReplSigOnly,selectize=FALSE)
+                                                                     selected=braw.def$design$Replication$forceSigOriginal,selectize=FALSE)
                                                  ),
                                                  tags$td(width = "25%"),
                                                  tags$td(width = "25%")
@@ -32,16 +32,16 @@ replicationTab<-function(prefix="") {
                                                  tags$td(width = "20%", id="sBudget1", tags$div(style = localStyle, "Repeats:")),
                                                  tags$td(width = "30%", 
                                                          selectInput("sReplType",label=NULL,
-                                                                     choices=c("Fixed","Budget"),
-                                                                     selected=design$sReplType,selectize=FALSE)
+                                                                     choices=c("Unlimited","Budget"),
+                                                                     selected=braw.def$design$Replication$BudgetType,selectize=FALSE)
                                                  ),
                                                  tags$td(width = "50%",
-                                                         conditionalPanel(condition="input.sReplType=='Fixed'",
+                                                         conditionalPanel(condition="input.sReplType=='Unlimited'",
                                                                           tags$table(width = "100%",class="myTable",
                                                                                      tags$tr(
                                                                                        tags$td(width = "50%",tags$div(style = localPlainStyle, "number:")),
                                                                                        tags$td(width = "50%", 
-                                                                                               numericInput("sReplRepeats",label=NULL,value=design$sReplRepeats,min=0, max=100, step=1)
+                                                                                               numericInput("sReplRepeats",label=NULL,value=braw.def$design$Replication$Repeats,min=0, max=100, step=1)
                                                                                        )
                                                                                      )
                                                                           )
@@ -51,7 +51,7 @@ replicationTab<-function(prefix="") {
                                                                                      tags$tr(
                                                                                        tags$td(width = "50%",tags$div(style = localPlainStyle, "available:")),
                                                                                        tags$td(width = "50%", 
-                                                                                               numericInput("sReplBudget",label=NULL,value=design$sReplBudget)
+                                                                                               numericInput("sReplBudget",label=NULL,value=braw.def$design$Replication$Budget)
                                                                                        )
                                                                                      )
                                                                           )
@@ -64,18 +64,18 @@ replicationTab<-function(prefix="") {
                                                  tags$td(width = "25%"),
                                                  tags$td(width = "20%", tags$div(style = localStyle, "Power: ")),
                                                  tags$td(width = "5%", 
-                                                         checkboxInput("sReplPowerOn",label=NULL,value=design$sReplPowerOn)
+                                                         checkboxInput("sReplPowerOn",label=NULL,value=braw.def$design$Replication$PowerOn)
                                                  ),
                                                  tags$td(width="50%",
                                                          conditionalPanel(condition="input.sReplPowerOn",
                                                                           tags$table(width = "100%",class="myTable", 
                                                                                      tags$tr(
                                                                                        tags$td(width = "50%", 
-                                                                                               numericInput("sReplPower",label=NULL,value=design$sReplPower,min=0, max=1, step=0.1)
+                                                                                               numericInput("sReplPower",label=NULL,value=braw.def$design$Replication$Power,min=0, max=1, step=0.1)
                                                                                        ),
                                                                                        tags$td(width = "50%", selectInput("sReplTails",label=NULL,
                                                                                                                           choices=c("2-tail"=2,"1-tail"=1),
-                                                                                                                          selected=design$sReplTails,selectize=FALSE)
+                                                                                                                          selected=braw.def$design$Replication$Tails,selectize=FALSE)
                                                                                        )
                                                                                      )
                                                                           )
@@ -84,7 +84,7 @@ replicationTab<-function(prefix="") {
                                                )
                                     ),
                                     conditionalPanel(condition="input.sReplPowerOn",
-                                      tags$table(width = "100%",class="myTable", id="extraRep1",
+                                      tags$table(width = "100%",class="myTable", 
                                                tags$tr(
                                                  tags$td(width = "25%"),
                                                  tags$td(width = "20%"),
@@ -92,24 +92,24 @@ replicationTab<-function(prefix="") {
                                                  tags$td(width = "25%", tags$div(style = localPlainStyle, "Prior: ")),
                                                  tags$td(width = "25%", 
                                                          selectInput("sReplCorrection",label=NULL,
-                                                                     choices=c("None","World","Prior"),selected=design$sReplCorrection,selectize=FALSE)
+                                                                     choices=c("None","World","Prior"),selected=braw.def$design$Replication$PowerPrior,selectize=FALSE)
                                                  )
                                                )
                                     ),
                                     ),
-                                    # tags$table(width = "100%",class="myTable", id="extraRep2",
+                                    # tags$table(width = "100%",class="myTable", 
                                     #            tags$tr(
                                     #              tags$td(width = "25%"),
                                     #              tags$td(width = "20%", tags$div(style = localStyle, "Budget:")),
                                     #              tags$td(width = "5%", 
-                                    #                      checkboxInput("sReplUseBudget",label=NULL,value=design$sReplUseBudget)
+                                    #                      checkboxInput("sReplUseBudget",label=NULL,value=braw.def$design$Replication$UseBudget)
                                     #              ),
                                     #              tags$td(width = "50%", id="sBudget2", 
                                     #                      conditionalPanel(condition="input.sReplUseBudget",
                                     #                      tags$table(width = "100%",class="myTable", 
                                     #                                 tags$tr(
                                     #                                   tags$td(width = "50%",tags$div(style = localPlainStyle, "Total:")),
-                                    #                                   tags$td(width = "50%", numericInput("sReplBudget",label=NULL,value=design$sReplBudget))
+                                    #                                   tags$td(width = "50%", numericInput("sReplBudget",label=NULL,value=braw.def$design$Replication$Budget))
                                     #                                 )
                                     #                      )
                                     #                      )
@@ -121,8 +121,8 @@ replicationTab<-function(prefix="") {
                                                  tags$td(width = "20%", tags$div(style = localStyle, "Out:")),
                                                  tags$td(width = "30%", 
                                                          selectInput("sReplKeep",label=NULL,
-                                                                     choices=c("last","joint","cautious","median","largest n"="largeN","smallest p"="smallP"),
-                                                                     selected=design$sReplKeep,selectize=FALSE)
+                                                                     choices=c("Cautious","Last","Joint","Median","largest n"="LargeN","smallest p"="SmallP"),
+                                                                     selected=braw.def$design$Replication$Keep,selectize=FALSE)
                                                  ),
                                                  tags$td(width = "25%"),
                                                  tags$td(width = "25%")

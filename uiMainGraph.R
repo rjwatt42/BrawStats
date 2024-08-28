@@ -1,4 +1,3 @@
-source("uiMetaGraph.R")
 source("uiPossibleGraph.R")
 
 
@@ -19,16 +18,18 @@ MainGraphs <- function() {
                          style="margin:0px;padding:0px;",
                          plotOutput("InferentialPlot")
                 ),
+                tabPanel("Likelihood",
+                         style="margin:0px;padding:0px;",
+                         plotOutput("LikelihoodPlot")
+                ),
                 tabPanel("Expect",value="Expect", 
                          style="margin:0px;padding:0px;",
                          plotOutput("ExpectedPlot")
                 )
-                ,metaGraphPanel()
                 ,tabPanel("Explore",value="Explore",
                           style="margin:0px;padding:0px;",
                           plotOutput("ExplorePlot")
                 )
-                ,possibleGraphPanel()
     ),
   )
 }
@@ -51,16 +52,18 @@ MainGraphs1 <-function() {
                          style="margin:0px;padding:0px;",
                          plotOutput("InferentialPlot1")
                 ),
+                tabPanel("Likelihood",
+                         style="margin:0px;padding:0px;",
+                         plotOutput("LikelihoodPlot1")
+                ),
                 tabPanel("Expect",value="Expect", 
                          style="margin:0px;padding:0px;",
                          plotOutput("ExpectedPlot1")
                 )
-                ,metaGraphPanel1()
                 ,tabPanel("Explore",value="Explore",
                           style="margin:0px;padding:0px;",
                           plotOutput("ExplorePlot1")
                 )
-                ,possibleGraphPanel1()
     ),
     # ,width=fullPanelWidth
   )

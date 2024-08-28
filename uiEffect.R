@@ -10,7 +10,7 @@ effectPanel <- function(prefix="",asTable=FALSE,full=TRUE) {
                  tags$tr(
                    tags$td(width = "40%", tags$div(style = localStyle, "IV",HTML("&rarr;"),"DV :")),
                    tags$td(width = "20%", 
-                           numericInput(paste0(prefix,"rIV"), label=NULL,value=effect$rIV,min=-1,max=1,step=0.05)
+                           numericInput(paste0(prefix,"rIV"), label=NULL,value=braw.def$effect$rIV,min=-1,max=1,step=0.05)
                    ),
                    tags$td(width = "40%"),
                  )
@@ -25,7 +25,7 @@ eT2<-tags$table(width = "100%",class="myTable",
              tags$tr(
                tags$td(width = "40%", tags$div(style = localStyle, "IV",HTML("&rarr;"),"DV :")),
                tags$td(width = "20%", 
-                       numericInput(paste0(prefix,"rIV"), label=NULL,value=effect$rIV,min=-1,max=1,step=0.05)
+                       numericInput(paste0(prefix,"rIV"), label=NULL,value=braw.def$effect$rIV,min=-1,max=1,step=0.05)
                ),
                tags$td(width = "40%"),
              ),
@@ -40,7 +40,7 @@ eT2<-tags$table(width = "100%",class="myTable",
                                                      min = -1,
                                                      max = 1,
                                                      step = 0.05,
-                                                     value = effect$rIV2
+                                                     value = braw.def$effect$rIV2
                                         ))),
                tags$td(width = "40%", 
                        tags$div(style = localStyle, " ")
@@ -58,7 +58,7 @@ eT2<-tags$table(width = "100%",class="myTable",
                                                      min = -1,
                                                      max = 1,
                                                      step = 0.05,
-                                                     value = effect$rIVIV2
+                                                     value = braw.def$effect$rIVIV2
                                         ))),
                tags$td(width = "40%", tags$div(style = localStyle, " "))
                
@@ -74,7 +74,7 @@ eT2<-tags$table(width = "100%",class="myTable",
                                                      min = -1,
                                                      max = 1,
                                                      step = 0.05,
-                                                     value = effect$rIVIV2DV
+                                                     value = braw.def$effect$rIVIV2DV
                                         ))),
                tags$td(width = "40%", tags$div(style = localStyle, " "))
              ),

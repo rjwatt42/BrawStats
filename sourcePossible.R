@@ -48,7 +48,6 @@ updatePossible<-function(){
                 populationPDFk=input$world_distr_k,
                 populationNullp=input$world_distr_Nullp
     )
-    if (pPlus) world$populationNullp<-1-world$populationNullp
   } else {
     world<-list(worldOn=FALSE,populationPDF="Single",populationRZ="R", 
                 populationPDFk=effect$rIV,
@@ -60,7 +59,7 @@ updatePossible<-function(){
           "Populations"={
             possible<-
               list(type=showPossible,
-                   UsePrior=input$possibleUsePrior,
+                   UsePrior=input$likelihoodUsePrior,
                    UseSource=input$possibleUseSource,
                    prior=list(worldOn=TRUE,populationPDF=input$Prior_distr,populationRZ=input$Prior_distr_rz, 
                               populationPDFk=input$Prior_distr_k,
@@ -72,7 +71,7 @@ updatePossible<-function(){
                    ResultHistory=ResultHistory,
                    sigOnly=input$possible_sigonly,
                    possibleTheory=input$possibleTheory,
-                   possibleSimSlice=input$possibleSimSlice,possibleCorrection=input$possibleCorrection,
+                   possibleSimSlice=input$possibleSimSlice,correction=input$correction,
                    possibleHQ=input$possibleHQ,
                    appendSim=input$possibleP_append,possibleLength=as.numeric(input$possibleP_length),
                    view=input$possibleView,show=input$possibleShow,azimuth=input$possibleAzimuth,elevation=input$possibleElevation,range=input$possibleRange,boxed=input$possibleBoxed,
@@ -82,7 +81,7 @@ updatePossible<-function(){
           "Samples"={
             possible<-
               list(type=showPossible,
-                   UsePrior=input$possibleUsePrior,
+                   UsePrior=input$likelihoodUsePrior,
                    UseSource=input$possibleUseSource,
                    prior=list(worldOn=TRUE,populationPDF=input$Prior_distr,populationRZ=input$Prior_distr_rz, populationPDFk=input$Prior_distr_k,
                               populationNullp=input$Prior_Nullp),
@@ -92,7 +91,7 @@ updatePossible<-function(){
                    cutaway=input$possible_cutaway,
                    sigOnly=input$possible_sigonly,
                    ResultHistory=ResultHistory,
-                   possibleTheory=input$possibleTheory,possibleSimSlice=input$possibleSimSlice,possibleCorrection=input$possibleCorrection,
+                   possibleTheory=input$possibleTheory,possibleSimSlice=input$possibleSimSlice,correction=input$correction,
                    possibleHQ=input$possibleHQ,
                    appendSim=input$possible_append,possibleLength=as.numeric(input$possible_length),
                    view=input$possibleView,show=input$possibleShow,azimuth=input$possibleAzimuth,elevation=input$possibleElevation,range=input$possibleRange,boxed=input$possibleBoxed,
@@ -101,8 +100,7 @@ updatePossible<-function(){
             # if (possible$show=="Power") possible$show<-"Normal"
           }
   )
-  if (pPlus) possible$prior$populationNullp<-1-possible$prior$populationNullp
-  
+
   if (possible$world$worldOn==FALSE) {
     possible$world$populationPDF<-"Single"
     possible$world$populationRZ<-"r"
@@ -131,7 +129,7 @@ updatePossible<-function(){
 # main likelihood calcuations    
 possibleReset<-observeEvent(c(input$Prior_Nullp,
                                 input$Prior_distr,input$Prior_distr_rz,input$Prior_distr_k,
-                                input$possibleUsePrior,
+                                input$likelihoodUsePrior,
                                 input$sN
 ),{
   possiblePResultHold<<-c()
@@ -141,19 +139,18 @@ possibleReset<-observeEvent(c(input$Prior_Nullp,
 possibleAnalysis<-eventReactive(c(input$PossiblePanel,
                                     input$possible_run,input$possibleP_run,
                                     input$possiblePSampRho,
-                                    input$possibleUsePrior,input$possibleUseSource,
+                                    input$likelihoodUsePrior,input$possibleUseSource,
                                     input$Prior_distr,input$Prior_distr_rz,input$Prior_distr_k,input$Prior_Nullp,
                                     input$rIV,
                                     input$world_on,input$world_distr,input$world_distr_rz,input$world_distr_k,input$world_distr_Nullp,
-                                    input$sN,input$sNRand,input$sNRandK,input$sReplicationOn,input$sReplPowerOn,input$sReplPower,
+                                    input$sN,input$sNRand,input$sNRandK,input$sOn,input$sReplPowerOn,input$sReplPower,
                                     input$EvidencenewSample,
                                     input$possibleTheory,input$possible_sigonly,
-                                    input$possibleSimSlice,input$possibleCorrection,
+                                    input$possibleSimSlice,input$correction,
                                     input$possibleHQ,
                                     input$possibleShow
 ),{
-  if (graphicSource=="None") {return(possibleResult)}
-    
+
   req(input$changed)
   
   if (is.element(input$changed,c("possibleP_run")) && is.na(input$possiblePSampRho)) {
@@ -167,7 +164,6 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
                                  "possibleTheory",
                                  "sN","sNRand","sNRandK")))
   {
-    graphicSource<<-"Main"
     showPossible<-input$PossiblePanel
   }
   IV<-updateIV()
@@ -180,10 +176,12 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
   possible<-updatePossible()
   
   if ((input$possible_run+input$possibleP_run>validPossible)){
-    showNotification(paste0("Possible ",possible$type," : starting"),id="counting",duration=Inf,closeButton=FALSE,type="message")
+    if (switches$showProgress)
+      showNotification(paste0("Possible ",possible$type," : starting"),id="counting",duration=Inf,closeButton=FALSE,type="message")
     validPossible<<-validPossible+1
     possibleRes<-possibleRun(IV,DV,effect,design,evidence,possible,metaResult,doSample = TRUE)
-    removeNotification(id="counting")
+    if (switches$showProgress)
+      removeNotification(id="counting")
     keepSamples<-FALSE
   } else {
     possibleRes<-possibleRun(IV,DV,effect,design,evidence,possible,metaResult,doSample = FALSE)
@@ -212,10 +210,10 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
 )
 
 makePossibleGraph<-function(){
-  if (!is.element(showPossible,c("Samples","Populations"))) {return(ggplot()+plotBlankTheme)}
+  if (!is.element(showPossible,c("Samples","Populations"))) {return(ggplot()+braw.env$blankTheme())}
   IV<-updateIV()
   DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
+  if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme())}
   
   effect<-updateEffect()
   design<-updateDesign()
@@ -245,10 +243,10 @@ output$PossiblePlot1 <- renderPlot( {
 
 # report likelihood analysis        
 makePossibleReport<-function() {
-  if (!is.element(showPossible,c("Samples","Populations"))) {return(ggplot()+plotBlankTheme)}
+  if (!is.element(showPossible,c("Samples","Populations"))) {return(ggplot()+braw.env$blankTheme())}
   IV<-updateIV()
   DV<-updateDV()
-  if (is.null(IV) || is.null(DV)) {return(ggplot()+plotBlankTheme)}
+  if (is.null(IV) || is.null(DV)) {return(ggplot()+braw.env$blankTheme())}
   
   effect<-updateEffect()
   design<-updateDesign()
