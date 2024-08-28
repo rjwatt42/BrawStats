@@ -72,6 +72,11 @@ designChoicesExtra=list("Sampling"=list("Sample Size" = "n",
                                        "Repl Repeats" = "Repeats")
 )
 
+analysisChoices=list( "Alpha" = "Alpha",
+                      "Transform" = "Transform",
+                      "EqualVar" = "EqualVar"
+)
+
 # names(designChoicesExtra$Sampling)[5]<-braw.env$alphaChar
 
 exploreShowChoices<-list("Basic" = "Basic","Custom"="Custom","p(sig)"="p(sig)","Power" = "Power","NHST" = "NHST","Hits"="Hits","Misses"="Misses")
@@ -180,31 +185,31 @@ ExploreTab <-
                         ),
                         tabPanel("Design",id="ExD",
                                  style = paste("background: ",subpanelcolours$exploreC), 
-                                   tags$table(width = "100%",class="myTable",
-                                              tags$tr(
-                                                tags$td(width = "10%", tags$div(style = localStyle, "explore:")),
-                                                tags$td(width = "50%", 
-                                                        selectInput("Explore_typeD",label=NULL,
-                                                                    designChoices,selectize=FALSE)
-                                                ),
-                                                tags$td(width = "40%", tags$div(style = localStyle, " "))
-                                                )
-                                              ),
                                  tags$table(width = "100%",class="myTable",
                                             tags$tr(
-                                                tags$td(width = "20%",tags$div(style = localPlainStyle, "min:")),
-                                                tags$td(width = "20%",numericInput("Explore_minValD", label=NULL,value=10)
-                                                ),
-                                                tags$td(width = "10%",tags$div(style = localPlainStyle, "max:")),
-                                                tags$td(width = "20%",numericInput("Explore_maxValD", label=NULL,value=250)
-                                                ),
-                                                tags$td(width = "5%",tags$div(style = localPlainStyle, "n:")),
-                                                tags$td(width = "15%",numericInput("Explore_NPointsD", label=NULL,value=13)
-                                                ),
-                                                tags$td(width = "5%",tags$div(style = localPlainStyle, "log")),
-                                                tags$td(width = "5%",checkboxInput("Explore_xlogD",label="",value=FALSE)
-                                                        )
+                                              tags$td(width = "10%", tags$div(style = localStyle, "explore:")),
+                                              tags$td(width = "50%", 
+                                                      selectInput("Explore_typeD",label=NULL,
+                                                                  designChoices,selectize=FALSE)
+                                              ),
+                                              tags$td(width = "40%", tags$div(style = localStyle, " "))
+                                            )
+                                 ),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "20%",tags$div(style = localPlainStyle, "min:")),
+                                              tags$td(width = "20%",numericInput("Explore_minValD", label=NULL,value=10)
+                                              ),
+                                              tags$td(width = "10%",tags$div(style = localPlainStyle, "max:")),
+                                              tags$td(width = "20%",numericInput("Explore_maxValD", label=NULL,value=250)
+                                              ),
+                                              tags$td(width = "5%",tags$div(style = localPlainStyle, "n:")),
+                                              tags$td(width = "15%",numericInput("Explore_NPointsD", label=NULL,value=13)
+                                              ),
+                                              tags$td(width = "5%",tags$div(style = localPlainStyle, "log")),
+                                              tags$td(width = "5%",checkboxInput("Explore_xlogD",label="",value=FALSE)
                                               )
+                                            )
                                  ),
                                  tags$table(width = "100%",class="myTable",
                                             tags$tr(
@@ -238,22 +243,99 @@ ExploreTab <-
                                               ),
                                             ),
                                             tags$tr(
-                                                tags$td(width = "15%", 
-                                                        conditionalPanel(condition="input.IV2choice != 'none'",
-                                                                         selectInput("whichEffectD", label=NULL,
-                                                                    whichEffectShow, selected="Main 1",selectize = FALSE)
-                                                )),
-                                              )),
-                                   tags$table(width = "100%",class="myTable",
-                                              tags$tr(
-                                                tags$td(width = "20%", actionButton("exploreRunD", startLabel)),
-                                                tags$td(width = "10%", tags$div(style = localStyle, "Runs:")),
-                                                tags$td(width = "55%", 
-                                                        numericInput("Explore_lengthD", label=NULL,
-                                                                    value=10)
-                                                ),
+                                              tags$td(width = "15%", 
+                                                      conditionalPanel(condition="input.IV2choice != 'none'",
+                                                                       selectInput("whichEffectD", label=NULL,
+                                                                                   whichEffectShow, selected="Main 1",selectize = FALSE)
+                                                      )),
+                                            )),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "20%", actionButton("exploreRunD", startLabel)),
+                                              tags$td(width = "10%", tags$div(style = localStyle, "Runs:")),
+                                              tags$td(width = "55%", 
+                                                      numericInput("Explore_lengthD", label=NULL,
+                                                                   value=10)
+                                              ),
+                                            )
+                                 )
+                        ),
+                        tabPanel("Analysis",id="ExA",
+                                 style = paste("background: ",subpanelcolours$exploreC), 
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "10%", tags$div(style = localStyle, "explore:")),
+                                              tags$td(width = "50%", 
+                                                      selectInput("Explore_typeA",label=NULL,
+                                                                  analysisChoices,selectize=FALSE)
+                                              ),
+                                              tags$td(width = "40%", tags$div(style = localStyle, " "))
+                                            )
+                                 ),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "20%",tags$div(style = localPlainStyle, "min:")),
+                                              tags$td(width = "20%",numericInput("Explore_minValA", label=NULL,value=10)
+                                              ),
+                                              tags$td(width = "10%",tags$div(style = localPlainStyle, "max:")),
+                                              tags$td(width = "20%",numericInput("Explore_maxValA", label=NULL,value=250)
+                                              ),
+                                              tags$td(width = "5%",tags$div(style = localPlainStyle, "n:")),
+                                              tags$td(width = "15%",numericInput("Explore_NPointsA", label=NULL,value=13)
+                                              ),
+                                              tags$td(width = "5%",tags$div(style = localPlainStyle, "log")),
+                                              tags$td(width = "5%",checkboxInput("Explore_xlogA",label="",value=FALSE)
                                               )
-                                   )
+                                            )
+                                 ),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "10%", tags$div(style = localStyle, "show:")),
+                                              tags$td(width = "35%", 
+                                                      selectInput("Explore_showA",label=NULL,
+                                                                  exploreShowChoices,
+                                                                  selected="Basic",
+                                                                  selectize=FALSE)
+                                              ),
+                                              tags$td(width = "15%",style = localPlainStyle,
+                                                      conditionalPanel(condition="input.Explore_showA=='Custom'",
+                                                                       selectInput("Explore_par1A", label=NULL, 
+                                                                                   exploreShowParams,
+                                                                                   selected="rs", selectize=FALSE)
+                                                      ),
+                                              ),
+                                              tags$td(width = "15%",style = localPlainStyle,
+                                                      conditionalPanel(condition="input.Explore_showA=='Custom'",
+                                                                       selectInput("Explore_par2A", label=NULL, 
+                                                                                   exploreShowParams,
+                                                                                   selected="p", selectize=FALSE)
+                                                      ),
+                                              ),
+                                              tags$td(width = "25%",style = localPlainStyle,
+                                                      conditionalPanel(condition="input.Explore_showA=='Basic' | input.Explore_showA=='Custom' | input.Explore_showA=='Power'",
+                                                                       selectInput("Explore_dimA", label=NULL, 
+                                                                                   choices=c("1D"="1D","2D"="2D"),
+                                                                                   selected="1D", selectize=FALSE)
+                                                      ),
+                                              ),
+                                            ),
+                                            tags$tr(
+                                              tags$td(width = "15%", 
+                                                      conditionalPanel(condition="input.IV2choice != 'none'",
+                                                                       selectInput("whichEffectA", label=NULL,
+                                                                                   whichEffectShow, selected="Main 1",selectize = FALSE)
+                                                      )),
+                                            )),
+                                 tags$table(width = "100%",class="myTable",
+                                            tags$tr(
+                                              tags$td(width = "20%", actionButton("exploreRunA", startLabel)),
+                                              tags$td(width = "10%", tags$div(style = localStyle, "Runs:")),
+                                              tags$td(width = "55%", 
+                                                      numericInput("Explore_lengthA", label=NULL,
+                                                                   value=10)
+                                              ),
+                                            )
+                                 )
                         ),
                         tabPanel("#",
                                  style = paste("background: ",subpanelcolours$exploreC), 

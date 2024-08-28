@@ -11,8 +11,8 @@ runningExplore<-FALSE
 # UI changes
 # go to the explore tabs 
 # and set the explore run valid
-observeEvent(c(input$exploreRunH,input$exploreRunD),{
-  if (any(c(input$exploreRunH,input$exploreRunD))>0) {
+observeEvent(c(input$exploreRunH,input$exploreRunD,input$exploreRunA),{
+  if (any(c(input$exploreRunH,input$exploreRunD,input$exploreRunA))>0) {
     updateTabsetPanel(session,"Graphs",selected = "Explore")
     updateTabsetPanel(session,"Reports",selected = "Explore")
     
@@ -39,7 +39,9 @@ observeEvent(input$IV2choice,{
 })
 
 observeEvent(c(input$Explore_typeD,input$Explore_minValD,input$Explore_maxValD,input$Explore_NPointsD,input$Explore_xlogD,
-               input$Explore_typeH,input$Explore_minValH,input$Explore_maxValH,input$Explore_NPointsH,input$Explore_xlogH),{
+               input$Explore_typeH,input$Explore_minValH,input$Explore_maxValH,input$Explore_NPointsH,input$Explore_xlogH,
+               input$Explore_typeA,input$Explore_minValA,input$Explore_maxValA,input$Explore_NPointsA,input$Explore_xlogA
+),{
   runningExplore<<-FALSE
 })
 
@@ -61,6 +63,15 @@ observeEvent(input$Explore_typeD,{
   updateCheckboxInput(session,"Explore_xlogD",value=range$logScale)
 })
 
+# watch for changes to design
+observeEvent(input$Explore_typeA,{
+  range<-getExploreRange(list(exploreType=input$Explore_typeA))
+  updateNumericInput(session,"Explore_minValA",value=range$minVal)
+  updateNumericInput(session,"Explore_maxValA",value=range$maxVal)
+  updateNumericInput(session,"Explore_NPointsA",value=range$np)
+  updateCheckboxInput(session,"Explore_xlogA",value=range$logScale)
+})
+
 # set explore variable from UI    
 # update explore values    
 updateExplore<-function(){
@@ -78,6 +89,13 @@ updateExplore<-function(){
                       minVal=input$Explore_minValD,maxVal=input$Explore_maxValD,
                       xlog = input$Explore_xlogD
                       )
+            },
+            "Analysis"={
+              l<-list(exploreType=input$Explore_typeA,
+                      exploreNPoints = input$Explore_NPointsA,
+                      minVal=input$Explore_minValA,maxVal=input$Explore_maxValA,
+                      xlog = input$Explore_xlogA
+              )
             }
     )
   explore<-makeExplore(exploreType=l$exploreType,
@@ -106,13 +124,22 @@ updateExploreShow<-function() {
                     whichEffect=input$whichEffectD,
                     nsims=as.numeric(input$Explore_lengthD)
             )
-          }
+            },
+            "Analysis"={
+              l<-list(showType=input$Explore_showA, 
+                      par1=input$Explore_par1A,
+                      par2=input$Explore_par2A,
+                      dimension=input$Explore_dimA,
+                      whichEffect=input$whichEffectA,
+                      nsims=as.numeric(input$Explore_lengthA)
+              )
+            }
   )
   return(l)
 }
 # Main calculations    
 makeExploreResult <- function() {
-  doit<-c(input$Explore_showH,input$Explore_showD,input$Explore_showM,
+  doit<-c(input$Explore_showH,input$Explore_showD,input$Explore_showA,
           input$STMethod,input$alpha,input$likelihoodUsePrior)
 
   if (runningExplore) {
@@ -174,16 +201,14 @@ makeExploreGraph<-function() {
 }
 
 output$ExplorePlot <- renderPlot( {
-  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM)
-  startExplore<<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM)
+  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA)
   g<-makeExploreGraph()
   
   g  
 })
 
 output$ExplorePlot1 <- renderPlot( {
-  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM)
-  startExplore<<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM)
+  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA)
   g<-makeExploreGraph()
   
   g  
@@ -204,12 +229,12 @@ makeExploreReport<-function() {
 }
 
 output$ExploreReport <- renderPlot({
-  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM,
+  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA,
           input$STMethod,input$alpha)
   makeExploreReport()
 })
 output$ExploreReport1 <- renderPlot({
-  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunM,
+  doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA,
           input$STMethod,input$alpha)
   makeExploreReport()
 })

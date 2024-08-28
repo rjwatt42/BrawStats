@@ -303,7 +303,7 @@ updateEvidence<-function(){
     caseOrder=input$evidenceCaseOrder,
     shortHand=input$shortHand,
     llr=list(e1=input$llr1,e2=input$llr2),
-    Welch=input$Welch,Transform=input$Transform,
+    Welch=!input$Welch,Transform=input$Transform,
     prior=makeWorld()
   )
   
