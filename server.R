@@ -147,7 +147,21 @@ shinyServer(function(input, output, session) {
       updateTabsetPanel(session,"HypothesisDiagram",selected = "World")
     }
   })
-
+  
+  observeEvent(input$Evidence,{
+    if (input$Evidence=="Multiple") {
+      updateTabsetPanel(session,"Graphs",selected = "Expect")
+      updateTabsetPanel(session,"Reports",selected = "Expect")
+    }
+  })
+  
+  observeEvent(input$Explore,{
+    if (input$Explore!="Explore") {
+      updateTabsetPanel(session,"Graphs",selected = "Explore")
+      updateTabsetPanel(session,"Reports",selected = "Explore")
+    }
+  })
+  
   observeEvent(c(input$STMethod,input$alpha), {
     assign("STMethod",input$STMethod,braw.env)
     assign("alphaSig",input$alpha,braw.env)

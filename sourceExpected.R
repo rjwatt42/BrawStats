@@ -12,23 +12,23 @@ runningExpected<-FALSE
 observeEvent(c(input$EvidenceExpectedRun),{
   if (input$EvidenceExpectedRun>0) {
     runningExpected<<-TRUE
-    updateTabsetPanel(session,"Graphs",selected = "Expected")
-    updateTabsetPanel(session,"Reports",selected = "Expected")
+    updateTabsetPanel(session,"Graphs",selected = "Expect")
+    updateTabsetPanel(session,"Reports",selected = "Expect")
   }
 },priority=100
 )
 
 # set expected variable from UI
 
-updateExpected<-function(){
-  expected<-list(
-    nsims=as.numeric(input$EvidenceExpected_length),
+updateExpectedShow<-function(){
+  expectedShow<-list(
+    nsims=input$EvidenceExpected_length,
     showType=input$EvidenceExpected_type,
     par1=input$EvidenceExpected_par1,
     par2=input$EvidenceExpected_par2,
     dimension=input$EvidenceExpectedDim
   )
-  expected
+  expectedShow
 }    
 
 # Expected outputs
@@ -59,17 +59,18 @@ makeExpectedResult <- function() {
     assign("evidence",evidence,braw.def)
     if (!is.equalLists(oldEvidence,evidence)) assign("expected",NULL,braw.res)
 
-    expected<-updateExpected()
-    
+    nsims<-input$EvidenceExpected_length
+
     if (variablesHeld=="Data" && doResample && switches$doBootstrap) {design$sMethod<-"Resample"}
     
     if (switches$showProgress) {
       if (is.null(braw.res$expected))
-        showNotification(paste0("Expected: starting (",expected$nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
+        showNotification(paste0("Expected: starting (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
       else 
-        showNotification(paste0("Expected: adding (",expected$nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
+        showNotification(paste0("Expected: adding (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
     }
-    expectedResult<-doExpected(nsims=expected$nsims,expectedResult=braw.res$expected,hypothesis=hypothesis,design=design,evidence=evidence)
+    expectedResult<-doExpected(nsims=nsims,expectedResult=braw.res$expected,doingNull=TRUE,
+                               hypothesis=hypothesis,design=design,evidence=evidence)
     if (switches$showProgress) {removeNotification(id = "counting")}
     runningExpected<<-FALSE
     
@@ -114,12 +115,12 @@ makeExpectedResult <- function() {
 
 makeExpectedGraph <- function() {
   expectedResult<-makeExpectedResult()
-  if (expectedResult$count==0) return(ggplot()+braw.env$blankTheme())
+  if (is.null(expectedResult)) return(ggplot()+braw.env$blankTheme())
   
-  expected<-updateExpected()
-  showType<-expected$showType
-  if (showType=="Custom") showType<-paste0(expected$par1,";",expected$par2)
-  showExpected(expectedResult,showType=showType,dimension = expected$dimension)
+  expectedShow<-updateExpectedShow()
+  showType<-expectedShow$showType
+  if (showType=="Custom") showType<-paste0(expectedShow$par1,";",expectedShow$par2)
+  showExpected(expectedResult,showType=showType,dimension = expectedShow$dimension)
 }
 
 output$ExpectedPlot <- renderPlot({
@@ -144,11 +145,11 @@ output$ExpectedPlot1 <- renderPlot({
 
 makeExpectedReport<-function() {
   expectedResult<-makeExpectedResult()
-  if (expectedResult$count==0) return(ggplot()+braw.env$blankTheme())
+  if (is.null(expectedResult)) return(ggplot()+braw.env$blankTheme())
   
-  expected<-updateExpected()
-  showType<-expected$showType
-  if (showType=="Custom") showType<-paste0(expected$par1,";",expected$par2)
+  expectedShow<-updateExpectedShow()
+  showType<-expectedShow$showType
+  if (showType=="Custom") showType<-paste0(expectedShow$par1,";",expectedShow$par2)
   reportExpected(expectedResult,showType=showType)
 }
 

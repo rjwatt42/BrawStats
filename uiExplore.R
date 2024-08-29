@@ -102,7 +102,7 @@ ExploreTab <-
     wellPanel(id="uiExplore",
             style = paste("background: ",panelcolours$exploreC), 
             fluidRow(headerText("Explore design decisions")),
-            tabsetPanel(type="tabs",id="ExploreTab",
+            tabsetPanel(type="tabs",id="Explore",
                         # sampling tab
                         tabPanel("Explore:",value="Explore"
                         ),

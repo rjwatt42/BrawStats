@@ -75,7 +75,7 @@ observeEvent(input$Explore_typeA,{
 # set explore variable from UI    
 # update explore values    
 updateExplore<-function(){
-    switch (input$ExploreTab,
+    switch (input$Explore,
             "Hypothesis"={
               l<-list(exploreType=input$Explore_typeH,
                       exploreNPoints = input$Explore_NPointsH,
@@ -106,14 +106,13 @@ updateExplore<-function(){
   explore
 } 
 updateExploreShow<-function() {
-  switch (input$ExploreTab,
+  switch (input$Explore,
           "Hypothesis"={
             l<-list(showType=input$Explore_showH, 
                     par1=input$Explore_par1H,
                     par2=input$Explore_par2H,
                     dimension=input$Explore_dimH,
-                    whichEffect=input$whichEffectH,
-                    nsims=as.numeric(input$Explore_lengthH)
+                    whichEffect=input$whichEffectH
             )
           },
           "Design"={
@@ -121,8 +120,7 @@ updateExploreShow<-function() {
                     par1=input$Explore_par1D,
                     par2=input$Explore_par2D,
                     dimension=input$Explore_dimD,
-                    whichEffect=input$whichEffectD,
-                    nsims=as.numeric(input$Explore_lengthD)
+                    whichEffect=input$whichEffectD
             )
             },
             "Analysis"={
@@ -165,17 +163,22 @@ makeExploreResult <- function() {
   assign("explore",explore,braw.def)
   if (!is.equalLists(oldExplore,explore)) assign("explore",NULL,braw.res)
 
-  exploreShow<-updateExploreShow()
-  doingNull<- (explore$showType=="NHSTErrors" && 
-                 (!hypothesis$effect$world$worldOn || (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp==0)))
+  switch (input$Explore,
+          "Hypothesis"={nsims<-input$Explore_lengthH},
+          "Design"={nsims<-input$Explore_lengthD},
+          "Analysis"={nsims<-input$Explore_lengthA}
+  )
+  
+  # doingNull<- (explore$showType=="NHSTErrors" && 
+  #                (!hypothesis$effect$world$worldOn || (hypothesis$effect$world$worldOn && hypothesis$effect$world$populationNullp==0)))
 
   if (switches$showProgress) {
     if (is.null(braw.res$explore))
-      showNotification(paste0("Expected: starting (",exploreShow$nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
+      showNotification(paste0("Expected: starting (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
     else 
-      showNotification(paste0("Expected: adding (",exploreShow$nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
+      showNotification(paste0("Expected: adding (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
   }
-  exploreResult<-doExplore(explore,nsims=exploreShow$nsims,exploreResult=braw.res$explore)
+  exploreResult<-doExplore(explore,nsims=nsims,exploreResult=braw.res$explore,doingNull=TRUE)
   if (switches$showProgress) removeNotification(id = "counting")
   runningExplore<<-FALSE
   
