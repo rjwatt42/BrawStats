@@ -207,9 +207,31 @@ shinyServer(function(input, output, session) {
   
   observeEvent(input$Hypchoice,{
     newHyp<-getTypecombination(input$Hypchoice)
-    
+
+    updateSelectInput(session,"IVtype",selected=newHyp$IV$type)
+    updateNumericInput(session,"IVncats",value=newHyp$IV$ncats)
+    updateTextInput(session,"IVcases",value=newHyp$IV$cases)
+    updateTextInput(session,"IVprop",value=newHyp$IV$proportions)
     updateSelectInput(session,"sIV1Use",selected=newHyp$IV$deploy)
-    updateSelectInput(session,"sIV2Use",selected=newHyp$IV2$deploy)
+    
+    if (!is.null(newHyp$IV2)) {
+      updateTextInput(session,"IV2name",value="IV2new")
+      updateSelectInput(session,"IV2choice",selected="IV2")
+      updateSelectInput(session,"IV2type",selected=newHyp$IV2$type)
+      updateNumericInput(session,"IV2ncats",value=newHyp$IV2$ncats)
+      updateTextInput(session,"IV2cases",value=newHyp$IV2$cases)
+      updateTextInput(session,"IV2prop",value=newHyp$IV2$proportions)
+      updateSelectInput(session,"sIV2Use",selected=newHyp$IV2$deploy)
+      updateTextInput(session,"IV2name",value="IV2")
+    } else {
+      updateSelectInput(session,"IV2choice",selected="none")
+    }
+    
+    updateSelectInput(session,"DVtype",selected=newHyp$DV$type)
+    updateNumericInput(session,"DVncats",value=newHyp$DV$ncats)
+    updateTextInput(session,"DVcases",value=newHyp$DV$cases)
+    updateTextInput(session,"DVprop",value=newHyp$DV$proportions)
+    
     # 3 variable hypotheses look after themselves
     #
     if (!is.null(newHyp$IV2)) {

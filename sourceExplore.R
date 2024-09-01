@@ -112,7 +112,8 @@ updateExploreShow<-function() {
                     par1=input$Explore_par1H,
                     par2=input$Explore_par2H,
                     dimension=input$Explore_dimH,
-                    whichEffect=input$whichEffectH
+                    whichEffect=input$whichEffectH,
+                    effectType=input$EvidenceEffect_type
             )
           },
           "Design"={
@@ -198,7 +199,8 @@ makeExploreGraph<-function() {
     exploreShow$showType<-paste0(exploreShow$par1,";",exploreShow$par2)
   g<-showExplore(exploreResult,showType=exploreShow$showType,
                  dimension=exploreShow$dimension,
-                 whichEffect=exploreShow$whichEffect
+                 whichEffect=exploreShow$whichEffect,
+                 effectType=exploreShow$effectType
     )
   return(g)
 }
@@ -226,7 +228,7 @@ makeExploreReport<-function() {
   exploreShow<-updateExploreShow()
   if (exploreShow$showType=="Custom") exploreShow$showType<-paste0(exploreShow$par1,";",exploreShow$par2)
   g<-reportExplore(exploreResult,showType=exploreShow$showType,
-                 whichEffect=exploreShow$whichEffect
+                 whichEffect=exploreShow$whichEffect,effectType=exploreShow$effectType
   )
   return(g)
 }

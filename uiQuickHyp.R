@@ -8,13 +8,13 @@ quickHypotheses<-
                tags$td(width = "30%",
                        selectInput("Hypchoice", label = NULL,
                                    choices=
-                                     list("i~i"="ii","i~o"="oi","i~c2"="c2i","i~c3"="c3i",
-                                          "o~i"="io","o~o"="oo","o~c2"="c2o","o~c3"="c3o",
-                                          "c~i"="ic","c~o"="oc","c~c2"="c2c","c~c3"="c3c"," ",
-                                          "i~i+i"="iii","i~c+i"="cii","i~i+c"="ici","i~c+c"="cci","  ",
-                                          "i~w+i"="wii","i~i+w"="iwi","i~w+c"="wci","i~w+w"="wwi","  ",
-                                          "c~i+i"="iic","c~c+i"="cic","c~i+c"="icc","c~c+c"="ccc"),
-                                   selected="ii",
+                                     list("i~i","i~o","i~c2","i~c3",
+                                          "o~i","o~o","o~c2","o~c3",
+                                          "c~i","c~o","c~c2","c~c3"," ",
+                                          "i~i+i","i~c+i","i~i+c","i~c+c","  ",
+                                          "i~w+i","i~i+w","i~w+c","i~w+w","  ",
+                                          "c~i+i","c~c+i","c~i+c","c~c+c"),
+                                   selected="i~i",
                                    selectize=FALSE)
                ),
                tags$td(width = "25%")

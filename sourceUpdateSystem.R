@@ -121,7 +121,8 @@ observeEvent(c(input$IV2choice),
                  shinyjs::hide(id= "inspectIV2")
                  shinyjs::hide(id= "editIV2")
                  shinyjs::hide(id= "editIV2T")
-               } else {
+               } else
+               if (input$IV2name!="IV2new") {
                  
                  IV2<-getVariable(input$IV2choice)
                  updateNumericInput(session,"IV2mu",value=IV2$mu)    

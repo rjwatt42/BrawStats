@@ -138,7 +138,7 @@ HypothesisTab <-
                                                                tags$td(width = "30%", div(style = localStyle, "Type:")),
                                                                tags$td(width = "70%", 
                                                                        selectInput("IV2type", label= NULL,
-                                                                                   varTypes,selected=braw.def$IV2$type,
+                                                                                   varTypes,selected=braw.def$IV$type,
                                                                                    selectize=FALSE
                                                                        )
                                                                )
@@ -147,15 +147,15 @@ HypothesisTab <-
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Mean:")),
-                                                               tags$td(width = "20%", numericInput("IV2mu", value = braw.def$IV2$mu, label = NULL)),
+                                                               tags$td(width = "20%", numericInput("IV2mu", value = braw.def$IV$mu, label = NULL)),
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Sd:")),
-                                                               tags$td(width = "20%", numericInput("IV2sd", value = braw.def$IV2$sd, label = NULL))
+                                                               tags$td(width = "20%", numericInput("IV2sd", value = braw.def$IV$sd, label = NULL))
                                                              ),
                                                              tags$tr(
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Skew:")),
-                                                               tags$td(width = "20%",  numericInput("IV2skew", value = braw.def$IV2$skew, step=0.1, label = NULL)),
+                                                               tags$td(width = "20%",  numericInput("IV2skew", value = braw.def$IV$skew, step=0.1, label = NULL)),
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Kurtosis:")),
-                                                               tags$td(width = "20%",  numericInput("IV2kurt", value = braw.def$IV2$kurtosis, step=0.1, label = NULL))
+                                                               tags$td(width = "20%",  numericInput("IV2kurt", value = braw.def$IV$kurtosis, step=0.1, label = NULL))
                                                              ),
                                                   ),
                                  ),
@@ -163,9 +163,9 @@ HypothesisTab <-
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "No levels:")),
-                                                               tags$td(width = "20%", numericInput("IV2nlevs", value = braw.def$IV2$nlevs, label = NULL,step=1,min=2)),
+                                                               tags$td(width = "20%", numericInput("IV2nlevs", value = braw.def$IV$nlevs, label = NULL,step=1,min=2)),
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "IQR:")),
-                                                               tags$td(width = "20%", numericInput("IV2iqr", value = braw.def$IV2$iqr, label = NULL,step=0.5)),
+                                                               tags$td(width = "20%", numericInput("IV2iqr", value = braw.def$IV$iqr, label = NULL,step=0.5)),
                                                              ),
                                                   ),
                                  ),
@@ -173,16 +173,16 @@ HypothesisTab <-
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "No cases:")),
-                                                               tags$td(width = "20%", numericInput("IV2ncats", value = braw.def$IV2$ncats, label = NULL,step=1,min=2)),
+                                                               tags$td(width = "20%", numericInput("IV2ncats", value = braw.def$IV$ncats, label = NULL,step=1,min=2)),
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Proportions:")),
-                                                               tags$td(width = "20%", textInput("IV2prop", value = braw.def$IV2$proportions, label = NULL)),
+                                                               tags$td(width = "20%", textInput("IV2prop", value = braw.def$IV$proportions, label = NULL)),
                                                                # tags$td(width = "10%",  tags$div(style = localStyle, " "))
                                                              ),
                                                   ),
                                                   tags$table(width = "100%",class="myTable",
                                                              tags$tr(
                                                                tags$td(width = "30%",  tags$div(style = localStyle, "Cases:")),
-                                                               tags$td(width = "60%", textInput("IV2cases", value = braw.def$IV2$cases, label = NULL)),
+                                                               tags$td(width = "60%", textInput("IV2cases", value = braw.def$IV$cases, label = NULL)),
                                                                tags$td(width = "10%",  tags$div(style = localStyle, " "))
                                                              ),
                                                   )

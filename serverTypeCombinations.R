@@ -3,21 +3,22 @@ getTypecombination<-function(HypType) {
   IV<-getVariable("IV")
   IV2<-getVariable("IV2")
   DV<-getVariable("DV")
+
   switch (HypType,
     "ee"={
             IV2<-NULL
     },
-    "ii"={ #print(1)
+    "i~i"={ #print(1)
       IV$type<-"Interval"
       DV$type<-"Interval"
       IV2<-NULL
     },
-    "oi"={ #print(1)
+    "i~o"={ #print(1)
       IV$type<-"Ordinal"
       DV$type<-"Interval"
       IV2<-NULL
     },
-    "c2i"={ #print(2)
+    "i~c2"={ #print(2)
       IV$type<-"Categorical"
       IV$ncats<-2
       IV$cases<-"C1,C2"
@@ -25,7 +26,7 @@ getTypecombination<-function(HypType) {
       DV$type<-"Interval"
       IV2<-NULL
     },
-    "c3i"={ #print(2)
+    "i~c3"={ #print(2)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -33,17 +34,17 @@ getTypecombination<-function(HypType) {
       DV$type<-"Interval"
       IV2<-NULL
     },
-    "io"={ #print(3)
+    "o~i"={ #print(3)
       IV$type<-"Interval"
       DV$type<-"Ordinal"
       IV2<-NULL
     },
-    "oo"={ #print(3)
+    "o~o"={ #print(3)
       IV$type<-"Ordinal"
       DV$type<-"Ordinal"
       IV2<-NULL
     },
-    "c2o"={ #print(4)
+    "o~c2"={ #print(4)
       IV$type<-"Categorical"
       IV$ncats<-2
       IV$cases<-"C1,C2"
@@ -51,7 +52,7 @@ getTypecombination<-function(HypType) {
       DV$type<-"Ordinal"
       IV2<-NULL
     },
-    "c3o"={ #print(4)
+    "o~c3"={ #print(4)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -59,17 +60,17 @@ getTypecombination<-function(HypType) {
       DV$type<-"Ordinal"
       IV2<-NULL
     },
-    "ic"={ #print(5)
+    "c~i"={ #print(5)
       IV$type<-"Interval"
       DV$type<-"Categorical"
       IV2<-NULL
     },
-    "oc"={ #print(5)
+    "c~o"={ #print(5)
       IV$type<-"Ordinal"
       DV$type<-"Categorical"
       IV2<-NULL
     },
-    "c2c"={ #print(6)
+    "c~c2"={ #print(6)
       IV$type<-"Categorical"
       IV$ncats<-2
       IV$cases<-"C1,C2"
@@ -77,7 +78,7 @@ getTypecombination<-function(HypType) {
       DV$type<-"Categorical"
       IV2<-NULL
     },
-    "c3c"={ #print(6)
+    "c~c3"={ #print(6)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -86,12 +87,12 @@ getTypecombination<-function(HypType) {
       IV2<-NULL
     },
     
-       "iii"={ #print(11)
+       "i~i+i"={ #print(11)
               IV$type<-"Interval"
               IV2$type<-"Interval"
               DV$type<-"Interval"
             },
-       "cii"={ #print(12)
+       "i~c+i"={ #print(12)
               IV$type<-"Categorical"
               IV$ncats<-3
               IV$cases<-"C1,C2,C3"
@@ -99,7 +100,7 @@ getTypecombination<-function(HypType) {
               IV2$type<-"Interval"
               DV$type<-"Interval"
             },
-       "ici"={ #print(13)
+       "i~i+c"={ #print(13)
               IV$type<-"Interval"
               IV2$type<-"Categorical"
               IV2$ncats<-3
@@ -107,7 +108,7 @@ getTypecombination<-function(HypType) {
               IV2$proportions<-"1,1,1"
               DV$type<-"Interval"
             },
-       "cci"={ #print(14)
+       "i~c+c"={ #print(14)
               IV$type<-"Categorical"
               IV$ncats<-3
               IV$cases<-"C1,C2,C3"
@@ -118,7 +119,7 @@ getTypecombination<-function(HypType) {
               IV2$proportions<-"1,1,1"
               DV$type<-"Interval"
             },
-       "iic"={ #print(15)
+       "c~i+i"={ #print(15)
               IV$type<-"Interval"
               IV2$type<-"Interval"
               DV$type<-"Categorical"
@@ -127,7 +128,7 @@ getTypecombination<-function(HypType) {
               DV$proportions<-"1,1"
             },
     
-    "wii"={ #print(12)
+    "i~w+i"={ #print(12)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -136,7 +137,7 @@ getTypecombination<-function(HypType) {
       IV2$type<-"Interval"
       DV$type<-"Interval"
     },
-    "iwi"={ #print(13)
+    "i~i+w"={ #print(13)
       IV$type<-"Interval"
       IV2$type<-"Categorical"
       IV2$ncats<-3
@@ -145,7 +146,7 @@ getTypecombination<-function(HypType) {
       IV2$deploy<-"Within"
       DV$type<-"Interval"
     },
-    "wci"={ #print(14)
+    "i~w+c"={ #print(14)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -157,7 +158,7 @@ getTypecombination<-function(HypType) {
       IV2$proportions<-"1,1,1"
       DV$type<-"Interval"
     },
-    "wwi"={ #print(14)
+    "i~w+w"={ #print(14)
       IV$type<-"Categorical"
       IV$ncats<-3
       IV$cases<-"C1,C2,C3"
@@ -171,7 +172,7 @@ getTypecombination<-function(HypType) {
       DV$type<-"Interval"
     },
     
-    "iic"={ #print(15)
+    "c~i+i"={ #print(15)
       IV$type<-"Interval"
       IV2$type<-"Interval"
       DV$type<-"Categorical"
@@ -180,7 +181,7 @@ getTypecombination<-function(HypType) {
       DV$proportions<-"1,1"
     },
     
-       "cic"={ #print(16)
+       "c~c+i"={ #print(16)
               IV$type<-"Categorical"
               IV$ncats<-3
               IV$cases<-"C1,C2,C3"
@@ -191,7 +192,7 @@ getTypecombination<-function(HypType) {
               DV$cases<-"E1,E2"
               DV$proportions<-"1,1"
             },
-       "icc"={ #print(17)
+       "c~i+c"={ #print(17)
               IV$type<-"Interval"
               IV2$type<-"Categorical"
               IV2$ncats<-3
@@ -202,7 +203,7 @@ getTypecombination<-function(HypType) {
               DV$cases<-"E1,E2"
               DV$proportions<-"1,1"
             },
-       "ccc"={ #print(18)
+       "c~c+c"={ #print(18)
               IV$type<-"Categorical"
               IV$ncats<-3
               IV$cases<-"C1,C2,C3"

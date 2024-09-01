@@ -165,7 +165,8 @@ ExploreTab <-
                                               ),
                                             ),
                                             tags$tr(
-                                              tags$td(width = "15%", 
+                                              tags$td(width = "10%",style = localPlainStyle),
+                                              tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectH", label=NULL,
                                                                                    whichEffectShow, selected="Main 1",selectize = FALSE)
