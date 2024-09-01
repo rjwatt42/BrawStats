@@ -3,17 +3,17 @@
 loadExtras<-function(session,input,addingExtras=TRUE,all=TRUE){
   
   if (!addingExtras && all) {
-    switches$doReplications<<-FALSE
-    removeTab("Design","Replicate",session)
-    
-    switches$doWorlds<<-FALSE
-    removeTab("Hypothesis","World",session)
-    removeTab("HypothesisDiagram","World",session)
-    updateSelectInput(session,"possibleUseSource",choices=c("null","hypothesis","prior"))
-    updateSelectInput(session,"likelihoodUsePrior",choices=c("none","prior"))
-
-    switches$doCheating<<-FALSE
-    switches$doLikelihoodInfer<<-FALSE
+    # switches$doReplications<<-FALSE
+    # removeTab("Design","Replicate",session)
+    # 
+    # switches$doWorlds<<-FALSE
+    # removeTab("Hypothesis","World",session)
+    # removeTab("HypothesisDiagram","World",session)
+    # updateSelectInput(session,"possibleUseSource",choices=c("null","hypothesis","prior"))
+    # updateSelectInput(session,"likelihoodUsePrior",choices=c("none","prior"))
+    # 
+    # switches$doCheating<<-FALSE
+    # switches$doLikelihoodInfer<<-FALSE
 
     # updateSelectInput(session,"EvidenceInfer_type",choices=singleTypeChoices)
     # updateSelectInput(session,"EvidenceExpected_par1",choices=inferShowParams,selected="r")

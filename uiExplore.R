@@ -3,8 +3,7 @@ hypothesisChoicesV3=list("Effects"=list("Effect Size1" = "rIV",
                                                                 "Effect Size2" = "rIV2",
                                                                 "Interaction" = "rIVIV2DV",
                                                                 "Covariation" = "rIVIV2",
-                                                                "Heteroscedasticity" = "Heteroscedasticity",
-                                                                "Transform"="Transform"
+                                                                "Heteroscedasticity" = "Heteroscedasticity"
                                           ),
                           "Variables"=list("IVType" = "IVType",
                                           "IVskew" = "IVskew",
@@ -23,8 +22,7 @@ hypothesisChoicesV3=list("Effects"=list("Effect Size1" = "rIV",
 )
 
 hypothesisChoicesV2=list("Effects"=list("Effect Size" = "rIV",
-                                        "Heteroscedasticity" = "Heteroscedasticity",
-                                        "Transform"="Transform"
+                                        "Heteroscedasticity" = "Heteroscedasticity"
                                         ),
                          "Variables"=list("IVType" = "IVType",
                                           "IVskew" = "IVskew",
@@ -42,9 +40,9 @@ hypothesisChoicesV2=list("Effects"=list("Effect Size" = "rIV",
                          )
 )
 
-hypothesisChoicesV2Extra=c(hypothesisChoicesV2,list("Worlds"=list("worldPDF"="PDF","worldLambda"="lambda","worldPNull"="pNull")
+hypothesisChoicesV2Extra=c(hypothesisChoicesV2,list("Worlds"=list("worldLambda"="lambda","worldPNull"="pNull")
 ))
-hypothesisChoicesV3Extra=c(hypothesisChoicesV3,list("Worlds"=list("worldPDF"="PDF","worldLambda"="lambda","worldPNull"="pNull")
+hypothesisChoicesV3Extra=c(hypothesisChoicesV3,list("Worlds"=list("worldLambda"="lambda","worldPNull"="pNull")
 ))
 
 designChoices=list("Sampling"=list("Sample Size" = "n",
@@ -74,7 +72,8 @@ designChoicesExtra=list("Sampling"=list("Sample Size" = "n",
 
 analysisChoices=list( "Alpha" = "Alpha",
                       "Transform" = "Transform",
-                      "EqualVar" = "EqualVar"
+                      "EqualVar" = "EqualVar",
+                      "InteractionOn" = "InteractionOn"
 )
 
 # names(designChoicesExtra$Sampling)[5]<-braw.env$alphaChar
@@ -190,7 +189,7 @@ ExploreTab <-
                                               tags$td(width = "10%", tags$div(style = localStyle, "explore:")),
                                               tags$td(width = "50%", 
                                                       selectInput("Explore_typeD",label=NULL,
-                                                                  designChoices,selectize=FALSE)
+                                                                  designChoicesExtra,selectize=FALSE)
                                               ),
                                               tags$td(width = "40%", tags$div(style = localStyle, " "))
                                             )

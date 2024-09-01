@@ -215,7 +215,6 @@ shinyServer(function(input, output, session) {
     if (!is.null(newHyp$IV2)) {
       editVar$data<<-editVar$data+1
     }    
-    validSample<<-FALSE
   })
   
   observeEvent(input$Effectchoice,{

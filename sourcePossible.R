@@ -126,16 +126,6 @@ updatePossible<-function(){
   possible
 }
 
-# main likelihood calcuations    
-possibleReset<-observeEvent(c(input$Prior_Nullp,
-                                input$Prior_distr,input$Prior_distr_rz,input$Prior_distr_k,
-                                input$likelihoodUsePrior,
-                                input$sN
-),{
-  possiblePResultHold<<-c()
-  possibleSResultHold<<-c()
-})
-
 possibleAnalysis<-eventReactive(c(input$PossiblePanel,
                                     input$possible_run,input$possibleP_run,
                                     input$possiblePSampRho,
@@ -155,7 +145,6 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
   
   if (is.element(input$changed,c("possibleP_run")) && is.na(input$possiblePSampRho)) {
     hmm("Please set target sample effect size")
-    validPossible<<-validPossible+1
     return(possibleResult)
   }
   if (is.element(input$changed,c("PossiblePanel","possible_run","possibleP_run","possiblePSampRho",
@@ -175,10 +164,9 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
   result<-sampleAnalysis()
   possible<-updatePossible()
   
-  if ((input$possible_run+input$possibleP_run>validPossible)){
+  if ((input$possible_run+input$possibleP_run>0)){
     if (switches$showProgress)
       showNotification(paste0("Possible ",possible$type," : starting"),id="counting",duration=Inf,closeButton=FALSE,type="message")
-    validPossible<<-validPossible+1
     possibleRes<-possibleRun(IV,DV,effect,design,evidence,possible,metaResult,doSample = TRUE)
     if (switches$showProgress)
       removeNotification(id="counting")
@@ -191,18 +179,11 @@ possibleAnalysis<-eventReactive(c(input$PossiblePanel,
   
   switch (showPossible,
           "Samples"={          
-            # if (keepSamples && !is.null(possibleResult$samples$Sims$sSims)) {
-            # possibleRes$Sims<-possibleResult$samples$Sims
-            # }
             possibleResult$samples<<-possibleRes
             possibleSResultHold<<-list(sSims=possibleResult$samples$Sims$sSims,sSimBins=possibleResult$samples$Sims$sSimBins,sSimDens=possibleResult$samples$Sims$sSimDens)
           },
           "Populations"={
-            # if (keepSamples && !is.null(possibleResult$populations$Sims$pSims)) {
-            #   possibleRes$Sims<-possibleResult$populations$Sims
-            # }
             possibleResult$populations<<-possibleRes
-            # possiblePResultHold<<-list(pSims=possibleResult$populations$Sims$pSimsP,sSims=possibleResult$populations$Sims$pSims)
           }
   )
   possibleResult

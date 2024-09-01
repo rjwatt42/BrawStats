@@ -82,27 +82,19 @@ updateDV<-function(){
 }
 
 # UI changes    
-observeEvent(c(input$rIV,input$rIV2,input$rIVIV2,input$rIVIV2DV,
-               input$sN,input$sMethod,input$sIV1Use,input$sIV2Use),{
-                 if (debug) debugPrint("     effectChanged")
-                 
-                 # remove out of date sample and other 
-                 validSample<<-FALSE
-                 validExpected<<-FALSE
-                 validExplore<<-FALSE
-                 
-                 # expectedResult<-c()
-                 exploreResultHold<-list(Hypothesis=c(),Design=c())
-                 possiblePResultHold<-c()
-                 possibleSResultHold<-c()
-                 
-                 updateCheckboxInput(session,"ExploreAppendH",value=FALSE)
-                 updateCheckboxInput(session,"ExploreAppendD",value=FALSE)
-                 updateCheckboxInput(session,"ExploreAppendM",value=FALSE)
-                 
-                 if (debug) debugPrint("     effectChanged - exit")
-               },priority=100)
-
+observeEvent(input$IVtype,{
+  switch (input$IVtype,
+          "Interval"={
+            shinyjs::disable(id= "sIV1Use")
+          },
+          "Ordinal"={
+            shinyjs::disable(id= "sIV1Use")
+          },
+          "Categorical"={
+            shinyjs::enable(id= "sIV1Use")
+          }
+  )
+}) 
 observeEvent(c(input$IVchoice),
              {
                IV<-getVariable(input$IVchoice)
@@ -121,20 +113,6 @@ observeEvent(c(input$IVchoice),
                updateTextInput(session,"IVprop",value=paste(IV$proportions,collapse=","))
                updateSelectInput(session,"IVcatSource",selected=IV$catSource)
                
-               switch (IV$type,
-                       "Interval"={
-                         shinyjs::disable(id= "sIV1Use")
-                       },
-                       "Ordinal"={
-                         shinyjs::disable(id= "sIV1Use")
-                       },
-                       "Categorical"={
-                         shinyjs::enable(id= "sIV1Use")
-                       }
-               )
-               validSample<<-FALSE
-               validExpected<<-FALSE
-               validExplore<<-FALSE
              })
 
 observeEvent(c(input$IV2choice),
@@ -164,23 +142,23 @@ observeEvent(c(input$IV2choice),
                  shinyjs::show(id= "inspectIV2")
                  shinyjs::show(id= "editIV2")
                  shinyjs::show(id= "editIV2T")
-                 switch (braw.def$IV$type,
-                         "Interval"={
-                           shinyjs::disable(id= "sIV2Use")
-                         },
-                         "Ordinal"={
-                           shinyjs::disable(id= "sIV2Use")
-                         },
-                         "Categorical"={
-                           shinyjs::enable(id= "sIV2Use")
-                         }
-                 )
                }
                
-               validSample<<-FALSE
-               validExpected<<-FALSE
-               validExplore<<-FALSE
              },priority = 100)
+
+observeEvent(input$IV2type,{
+  switch (input$IV2type,
+          "Interval"={
+            shinyjs::disable(id= "sIV2Use")
+          },
+          "Ordinal"={
+            shinyjs::disable(id= "sIV2Use")
+          },
+          "Categorical"={
+            shinyjs::enable(id= "sIV2Use")
+          }
+  )
+}) 
 
 observeEvent(c(input$DVchoice),
              {
@@ -200,9 +178,6 @@ observeEvent(c(input$DVchoice),
                updateTextInput(session,"DVprop",value=paste(DV$proportions,collapse=","))
                updateSelectInput(session,"DVcatSource",selected=DV$catSource)
                
-               validSample<<-FALSE
-               validExpected<<-FALSE
-               validExplore<<-FALSE
              })
 
 

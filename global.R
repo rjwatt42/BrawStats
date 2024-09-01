@@ -15,7 +15,6 @@ switches<-list(doKeys=TRUE,doClipboard=FALSE,
                doWorlds=TRUE,doMetaAnalysis=FALSE,doLikelihoodInfer=FALSE,doPossiblePower=FALSE,
                doVariablesExplore=FALSE,
                doBatchFiles=FALSE,
-               loadExtrasValue=FALSE,
                startBlank=FALSE,
                showAnimation=TRUE,
                showProgress=TRUE,
@@ -100,10 +99,6 @@ shiftKeyOn<-FALSE
 controlKeyOn<-FALSE
 altKeyOn<-FALSE
 
-validSample<-FALSE
-validExpected<-FALSE
-validExplore<-FALSE
-validPossible<-0
 show<-0
 
 #####################
@@ -156,6 +151,5 @@ if (is_local) {
   switches$doPossiblePower<-TRUE
   switches$doBatchFiles<-TRUE
   # switches$doWorlds<-TRUE
-    # switches$loadExtrasValue<-TRUE
 }
 

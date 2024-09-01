@@ -19,9 +19,9 @@ AnalysisTab <-
               ),
               tabPanel("Describe",
                        style = paste("background: ",subpanelcolours$analysisC), 
-                         tags$table(width = "100%",class="myTable",style=paste("margin:0px;padding:0px;margin-left:-20px;margin-right:-20px;"),
+                         tags$table(width = "100%",class="myTable",
                                     tags$tr(
-                                      tags$td(width = "50%", tags$div(style = localStyle, "Effect size type:")),
+                                      tags$td(width = "50%", tags$div(style = labelStyle, "Effect size type:")),
                                       tags$td(width = "40%", 
                                                                selectInput("EvidenceEffect_type",label=NULL,
                                                                            c("direct" = "direct",
@@ -30,9 +30,14 @@ AnalysisTab <-
                                                                              ),
                                                                            selectize=FALSE)
                                               ),
-                                      tags$td(width = "10%", tags$div(style = localStyle, "")),
+                                      tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
                                     ),
-              )),
+                                    tags$tr(
+                                      tags$td(width="50%",tags$div(style = labelStyle, "Display as:")),
+                                      tags$td(width="40%",selectInput("RZ",label=NULL, c("r"="r","z"="z"), selected=braw.env$RZ, selectize=FALSE)),
+                                      tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
+                                    )
+                         )),
               tabPanel("Infer",
                        style = paste("background: ",subpanelcolours$analysisC), 
                        tags$table(width = "100%",class="myTable",

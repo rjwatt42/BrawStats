@@ -103,29 +103,12 @@ HelpTab <-
                                               tags$td(width="35%",tags$div(style = localPlainStyle, "white")),
                                               tags$td(width="5%",checkboxInput("WhiteGraphs", label=NULL,value=FALSE)),
                                             ),
-                                 # ),
-                                 # tags$table(width = "100%",class="myTable",
                                             tags$tr(
-                                              tags$td(width="20%",tags$div(style = labelStyle, "Extras:")),
-                                              tags$td(width="35%",tags$div(style = localPlainStyle, "load")),
-                                              tags$td(width="5%",checkboxInput("LoadExtras", label=NULL,value=switches$loadExtras)),
-                                              tags$td(width="35%",tags$div(style = localPlainStyle, " ")),
-                                              tags$td(width="5%",tags$div(style = localPlainStyle, " ")),
+                                              tags$td(width="20%",tags$div(style = labelStyle, "Calculations:")),
+                                              tags$td(width="35%",tags$div(style = localPlainStyle, "shorthand")),
+                                              tags$td(width="5%",checkboxInput("shortHand",value=FALSE, label=NULL)),
+                                              tags$td(width="40%",tags$div(style = localPlainStyle, ""))
                                             )
-                                 ),
-                                 conditionalPanel(condition="input.LoadExtras",
-                                                  tags$table(width = "100%",class="myTable",
-                                                             tags$tr(
-                                                               tags$td(width="10%",tags$div(style = labelStyle, "Calculations:")),
-                                                               tags$td(width="35%",tags$div(style = localPlainStyle, "shorthand")),
-                                                               tags$td(width="5%",checkboxInput("shortHand",value=FALSE, label=NULL)),
-                                                               tags$td(width="50%",tags$div(style = localPlainStyle, ""))
-                                                             ),
-                                                             tags$tr(
-                                                               tags$td(width="10%",tags$div(style = labelStyle, "Display:")),
-                                                               tags$td(width="35%",selectInput("RZ",label=NULL, c("r"="r","z"="z"), selected=braw.env$RZ, selectize=FALSE))
-                                                             )
-                                                  )
                                  )
                         )
             )
