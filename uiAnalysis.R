@@ -26,8 +26,10 @@ AnalysisTab <-
                                                                selectInput("EvidenceEffect_type",label=NULL,
                                                                            c("direct" = "direct",
                                                                              "unique" = "unique",
-                                                                             "total" = "total"
+                                                                             "total" = "total",
+                                                                             "all" = "all"
                                                                              ),
+                                                                           selected="all",
                                                                            selectize=FALSE)
                                               ),
                                       tags$td(width = "10%", tags$div(style = localPlainStyle, "")),

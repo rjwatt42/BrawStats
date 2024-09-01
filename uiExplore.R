@@ -92,10 +92,10 @@ exploreShowParamsExtra<-list("rs"="rs","p"="p",
 )
 
 whichEffectShow=c("Main 1" = "Main 1",
-                   "Main 2" = "Main 2",
-                   "Interaction" = "Interaction",
-                   "Mains" = "Mains",
-                   "All" = "All")
+                  "Main 2" = "Main 2",
+                  "Interaction" = "Interaction",
+                  "Mains" = "Mains",
+                  "All" = "All")
 
 ExploreTab <-
     wellPanel(id="uiExplore",
