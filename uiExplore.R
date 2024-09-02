@@ -169,9 +169,10 @@ ExploreTab <-
                                               tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectH", label=NULL,
-                                                                                   whichEffectShow, selected="Main 1",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
-                                            )),
+                                            )
+                                 ),
                                  tags$table(width = "100%",class="myTable",
                                             tags$tr(
                                               tags$td(width = "20%", actionButton("exploreRunH", startLabel)),
@@ -246,7 +247,7 @@ ExploreTab <-
                                               tags$td(width = "15%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectD", label=NULL,
-                                                                                   whichEffectShow, selected="Main 1",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
                                             )),
                                  tags$table(width = "100%",class="myTable",
@@ -323,7 +324,7 @@ ExploreTab <-
                                               tags$td(width = "15%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectA", label=NULL,
-                                                                                   whichEffectShow, selected="Main 1",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
                                             )),
                                  tags$table(width = "100%",class="myTable",
@@ -341,31 +342,6 @@ ExploreTab <-
                                  style = paste("background: ",subpanelcolours$exploreC), 
                                    tags$table(width = "100%",class="myTable",
                                               tags$tr(
-                                                tags$td(width = "25%", tags$div(style = paste(localStyle,"text-align: left"), "Analysis")),
-                                                tags$td(width = "15%"),
-                                                tags$td(width = "30%"),
-                                                tags$td(width = "25%"),
-                                                tags$td(width = "5%")
-                                              ),
-                                              tags$tr(
-                                                tags$td(width = "25%", tags$div(style = localPlainStyle, "no points:")),
-                                                tags$td(width = "15%", 
-                                                        numericInput("Explore_npoints", label=NULL,value=13)
-                                                ),
-                                                tags$td(width="5%"),
-                                              ),
-                                              tags$tr(
-                                                tags$td(width = "25%", id="Explore_esRangeLabel", tags$div(style = localPlainStyle, "r-range:")),
-                                                tags$td(width = "15%", 
-                                                        numericInput("Explore_esRange", label=NULL,value=0.8,step=0.1)
-                                                ),
-                                                tags$td(width = "30%", tags$div(style = localPlainStyle, "anom-range:")),
-                                                tags$td(width = "25%", 
-                                                        numericInput("Explore_anomRange", label=NULL,value=0.9,step=0.1)
-                                                ),
-                                                tags$td(width="5%")
-                                                ),
-                                              tags$tr(
                                                 tags$td(width = "25%", tags$div(style = paste(localStyle,"text-align: left"), "Display")),
                                                 tags$td(width = "15%"),
                                                 tags$td(width = "30%"),
@@ -375,17 +351,11 @@ ExploreTab <-
                                               tags$tr(
                                                 tags$td(width = "25%", tags$div(style = localPlainStyle, "quantiles:")),
                                                 tags$td(width = "15%", 
-                                                        numericInput("Explore_quants", label=NULL,value=0.95, step = 0.01,min=0.01,max=0.99)
+                                                        numericInput("Explore_quants", label=NULL,value=0.5, step = 0.01,min=0.01,max=0.99)
                                                 ),
                                                 tags$td(width = "60%")
                                               ),
                                    )
-                                              # tags$tr(
-                                              #   tags$td(width = "45%", tags$div(style = localPlainStyle, "long hand:")),
-                                              #   tags$td(width = "5%"),
-                                              #   tags$td(width = "45%", tags$div(style = localPlainStyle, "show theory:")),
-                                              #   tags$td(width="5%",checkboxInput("exploreTheory",label=NULL,value=TRUE))
-                                              # )
                         )
                         # help tab
                         ,tabPanel(helpChar,value="?",

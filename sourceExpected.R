@@ -26,7 +26,9 @@ updateExpectedShow<-function(){
     showType=input$EvidenceExpected_type,
     par1=input$EvidenceExpected_par1,
     par2=input$EvidenceExpected_par2,
-    dimension=input$EvidenceExpectedDim
+    dimension=input$EvidenceExpectedDim,
+    whichEffect=input$whichEffectExpected,
+    effectType=input$EvidenceEffect_type
   )
   expectedShow
 }    
@@ -120,7 +122,8 @@ makeExpectedGraph <- function() {
   expectedShow<-updateExpectedShow()
   showType<-expectedShow$showType
   if (showType=="Custom") showType<-paste0(expectedShow$par1,";",expectedShow$par2)
-  showExpected(expectedResult,showType=showType,dimension = expectedShow$dimension)
+  showExpected(expectedResult,showType=showType,dimension = expectedShow$dimension,
+               whichEffect=expectedShow$whichEffect,effectType=expectedShow$effectType)
 }
 
 output$ExpectedPlot <- renderPlot({
@@ -150,7 +153,7 @@ makeExpectedReport<-function() {
   expectedShow<-updateExpectedShow()
   showType<-expectedShow$showType
   if (showType=="Custom") showType<-paste0(expectedShow$par1,";",expectedShow$par2)
-  reportExpected(expectedResult,showType=showType)
+  reportExpected(expectedResult,showType=showType,whichEffect=expectedShow$whichEffect,effectType=expectedShow$effectType)
 }
 
 # expected report

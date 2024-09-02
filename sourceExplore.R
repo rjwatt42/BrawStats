@@ -45,30 +45,39 @@ observeEvent(c(input$Explore_typeD,input$Explore_minValD,input$Explore_maxValD,i
   runningExplore<<-FALSE
 })
 
+getStep<-function(val,np) {
+  if (np!=13) return(1)
+  if (val==0) return(0.1)
+  return(10^(ceiling(log10(abs(val)))-1))
+}
+
 # watch for changes to hypothesis
 observeEvent(input$Explore_typeH,{
   range<-getExploreRange(list(exploreType=input$Explore_typeH))
-  updateNumericInput(session,"Explore_minValH",value=range$minVal)
-  updateNumericInput(session,"Explore_maxValH",value=range$maxVal)
-  updateNumericInput(session,"Explore_NPointsH",value=range$np)
+
+  updateNumericInput(session,"Explore_minValH",value=range$minVal,step=getStep(range$minVal,range$np))
+  updateNumericInput(session,"Explore_maxValH",value=range$maxVal,step=getStep(range$maxVal,range$np))
+  updateNumericInput(session,"Explore_NPointsH",value=range$np,step=1)
   updateCheckboxInput(session,"Explore_xlogH",value=range$logScale)
 })
 
 # watch for changes to design
 observeEvent(input$Explore_typeD,{
   range<-getExploreRange(list(exploreType=input$Explore_typeD))
-  updateNumericInput(session,"Explore_minValD",value=range$minVal)
-  updateNumericInput(session,"Explore_maxValD",value=range$maxVal)
-  updateNumericInput(session,"Explore_NPointsD",value=range$np)
+
+  updateNumericInput(session,"Explore_minValD",value=range$minVal,step=getStep(range$minVal,range$np))
+  updateNumericInput(session,"Explore_maxValD",value=range$maxVal,step=getStep(range$maxVal,range$np))
+  updateNumericInput(session,"Explore_NPointsD",value=range$np,step=1)
   updateCheckboxInput(session,"Explore_xlogD",value=range$logScale)
 })
 
 # watch for changes to design
 observeEvent(input$Explore_typeA,{
   range<-getExploreRange(list(exploreType=input$Explore_typeA))
-  updateNumericInput(session,"Explore_minValA",value=range$minVal)
-  updateNumericInput(session,"Explore_maxValA",value=range$maxVal)
-  updateNumericInput(session,"Explore_NPointsA",value=range$np)
+
+  updateNumericInput(session,"Explore_minValA",value=range$minVal,step=getStep(range$minVal,range$np))
+  updateNumericInput(session,"Explore_maxValA",value=range$maxVal,step=getStep(range$maxVal,range$np))
+  updateNumericInput(session,"Explore_NPointsA",value=range$np,step=1)
   updateCheckboxInput(session,"Explore_xlogA",value=range$logScale)
 })
 

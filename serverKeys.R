@@ -11,6 +11,14 @@ if (switches$doKeys) {
     if (input$keypress==17) controlKeyOn<<-TRUE
     if (input$keypress==18) altKeyOn<<-TRUE
 
+    
+    if (input$keypress==ascii("3") && controlKeyOn){
+      updateSelectInput(session,"IV2choice",selected="IV2")
+      updateNumericInput(session,"rIV",value=0.25)
+      updateNumericInput(session,"rIV2",value=-0.25)
+      updateNumericInput(session,"rIVIV2",value=0.25)
+    }
+    
     if (input$keypress==ascii("x") && controlKeyOn){
       updateCheckboxInput(session,"LoadExtras",value=!input$LoadExtras)
     }

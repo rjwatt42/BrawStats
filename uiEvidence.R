@@ -25,6 +25,13 @@ if (switches$doLikelihoodInfer) singleTypeChoices<-singleTypeChoicesExtra
 
 multipleTypeChoices<-list("Basic" = "Basic","Custom"="Custom","Power" = "Power","NHST" = "NHST","Hits"="Hits","Misses"="Misses")
 
+whichEffectShow=c("Main 1" = "Main 1",
+                  "Main 2" = "Main 2",
+                  "Interaction" = "Interaction",
+                  "Mains" = "Mains",
+                  "All" = "All")
+
+
 EvidenceTab <-
   
   wellPanel(id="EvidenceMain",
@@ -106,6 +113,14 @@ EvidenceTab <-
                                                                                    selected="1D", selectize=FALSE)
                                                       ),
                                               ),
+                                            ),
+                                            tags$tr(
+                                              tags$td(width = "10%",style = localPlainStyle),
+                                              tags$td(width = "35%", 
+                                                      conditionalPanel(condition="input.IV2choice != 'none'",
+                                                                       selectInput("whichEffectExpected", label=NULL,
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
+                                                      )),
                                             )
                                  ),
                                  tags$table(width = "100%",class="myTable",
