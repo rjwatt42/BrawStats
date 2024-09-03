@@ -3,7 +3,7 @@
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
-#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Dependence","Outliers","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
@@ -35,13 +35,15 @@ getExploreRange<-function(explore) {
   
   exploreType<-explore$exploreType
   if (is.element(exploreType,c("rIV","rIV2","rIVIV2","rIVIV2DV"))) exploreType<-"rs"
-  if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers","IVRange","DVRange"))) exploreType<-"anom"
+  if (is.element(exploreType,c("IVskew","DVskew","Heteroscedasticity","Dependence","Outliers"))) exploreType<-"anom"
+  if (is.element(exploreType,c("IVRangeC","IVRangeE","DVRange"))) exploreType<-"anom1"
   if (is.element(exploreType,c("IVkurtosis","DVkurtosis"))) exploreType<-"kurt"
   
   switch(exploreType,
          "n"=range<-list(minVal=10,maxVal=250,logScale=FALSE,np=13),
          "rs"=range<-list(minVal=-0.9,maxVal=0.9,logScale=FALSE,np=13),
          "anom"=range<-list(minVal=0,maxVal=1,logScale=FALSE,np=13),
+         "anom1"=range<-list(minVal=0.1,maxVal=3,logScale=FALSE,np=13),
          "kurt"=range<-list(minVal=1.5,maxVal=10^5,logScale=TRUE,np=13),
          "IVprops"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE,np=13),
          "DVprops"=range<-list(minVal=0.2,maxVal=0.8,logScale=FALSE,np=13),
@@ -146,7 +148,7 @@ mergeExploreResult<-function(res1,res2) {
 #' @param exploreType "rIV","Heteroscedasticity","rIV2","rIVIV2","rIVIV2DV" \cr
 #'                    "pNull","Lambda" \cr
 #'                    "n","Method","Usage","WithinCorr","ClusterRad","SampleGamma" \cr
-#'                     "Dependence","Outliers","IVRange","DVRange" \cr
+#'                     "Dependence","Outliers","IVRangeC","IVRangeE","DVRange" \cr
 #'                     "Cheating","CheatingAmount" \cr
 #'                     "Alpha","Transform","InteractionOn" \cr
 #'                     "Power","Keep","Repeats" \cr
@@ -274,7 +276,8 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
           "Dependence"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Outliers"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Heteroscedasticity"={vals<-seq(minVal,maxVal,length.out=npoints)},
-          "IVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "IVRangeC"={vals<-seq(minVal,maxVal,length.out=npoints)},
+          "IVRangeE"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "DVRange"={vals<-seq(minVal,maxVal,length.out=npoints)},
           "Cheating"={vals<-c("None","Grow","Prune","Replace","Retry","Add")},
           "CheatingAmount"={vals<-seq(minVal*design$sN,maxVal*design$sN,length.out=npoints)},
@@ -615,14 +618,18 @@ runExplore <- function(nsims,exploreResult,doingNull=FALSE,
                 },
                 "Dependence"={design$sDependence<-vals[vi]},
                 "Outliers"={design$sOutliers<-vals[vi]},
-                "IVRange"={
+                "IVRangeC"={
                   design$sRangeOn<-TRUE
                   design$sIVRange<-vals[vi]*c(-1,1)
                 },
-                "DVRange"={
+                "IVRangeE"={
                   design$sRangeOn<-TRUE
-                  design$sDVRange<-vals[vi]*c(-1,1)
+                  design$sIVRange<-c(-10,vals[vi])
                 },
+                # "DVRange"={
+                #   design$sRangeOn<-TRUE
+                #   design$sDVRange<-vals[vi]*c(-1,1)
+                # },
                 "Cheating"={
                   design$sCheating<-vals[vi]
                 },

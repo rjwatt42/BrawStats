@@ -143,14 +143,14 @@ doIt<-editVar$data
   g<-showPossible(
     doPossible(
       makePossible(
-        typePossible="Populations",
+        typePossible=input$likelihoodType,
         targetSample<-result$rIV,
         hypothesis=updateHypothesis(),design=updateDesign(),
         UsePrior=input$likelihoodUsePrior,
         prior=evidence$prior
         )
       ),
-    cutaway=input$possible_cutaway
+    cutaway=(input$possible_cutaway=="cutaway")
     )
   return(g)
 }

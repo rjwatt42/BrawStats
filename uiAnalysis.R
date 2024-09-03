@@ -35,11 +35,34 @@ AnalysisTab <-
                                       tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
                                     ),
                                     tags$tr(
+                                      tags$td(width = "50%", tags$div(style = localPlainStyle, "Transform")),
+                                      tags$td(width = "40%", 
+                                              selectInput("Transform",label=NULL,
+                                                          choices=c("None","Log","Exp"),
+                                                          selected=braw.def$evidence$Transform,
+                                                          selectize=FALSE
+                                              ),
+                                      ),
+                                      tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
+                                    )
+                         ),
+                       conditionalPanel(condition="input.IV2choice != 'none'",
+                                        tags$table(width = "100%",class="myTable",
+                                                   tags$tr(
+                                                     tags$td(width = "50%", tags$div(style = localPlainStyle, "Analyse interaction:")),
+                                                     tags$td(width = "5%",checkboxInput("rInteractionOn",label=NULL,value=braw.def$evidence$rInteractionOn)),
+                                                     tags$td(width = "45%", tags$div(style = localPlainStyle, "")),
+                                                   )
+                                        )
+                       ),
+                       tags$table(width = "100%",class="myTable",
+                                  tags$tr(
                                       tags$td(width="50%",tags$div(style = labelStyle, "Display as:")),
                                       tags$td(width="40%",selectInput("RZ",label=NULL, c("r"="r","z"="z"), selected=braw.env$RZ, selectize=FALSE)),
                                       tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
                                     )
-                         )),
+                         )
+              ),
               tabPanel("Infer",
                        style = paste("background: ",subpanelcolours$analysisC), 
                        tags$table(width = "100%",class="myTable",
@@ -53,20 +76,20 @@ AnalysisTab <-
                                                         selectize=FALSE
                                             )
                                     ),
-                                    tags$td(width = "15%",tags$div(style = localPlainStyle, paste0(braw.env$alphaChar,":"))),
+                                    tags$td(width = "10%",tags$div(style = localPlainStyle, paste0(braw.env$alphaChar,":"))),
+                                    tags$td(width = "5%",tags$div(style = localStyle, " ")),
                                     tags$td(width = "35%",
                                             numericInput("alpha",label=NULL,value=braw.env$alphaSig,step=0.01)
                                     ),
                                   )
-                                  ),
-                       conditionalPanel(condition="input.IV2choice != 'none'",
-                                        tags$table(width = "100%",class="myTable",
-                                                   tags$tr(
-                                                     tags$td(width = "30%", tags$div(style = localPlainStyle, "Interaction:")),
-                                                     tags$td(width = "25%", tags$div(style = localPlainStyle, "analyse")),
-                                                     tags$td(width = "10%",checkboxInput("rInteractionOn",label=NULL,value=braw.def$evidence$rInteractionOn))
-                                                   )
-                                        )
+                       ),
+                       tags$table(width = "100%",class="myTable",
+                                  tags$tr(
+                                    tags$td(width = "35%", tags$div(style = localPlainStyle, "Eq variance?")),
+                                    tags$td(width = "5%", 
+                                            checkboxInput("Welch",label=NULL,value=!braw.def$evidence$Welch),
+                                    ),
+                                  )
                        ),
               ),
               tabPanel("Likelihood",
@@ -124,6 +147,19 @@ AnalysisTab <-
                                   )
                        )
                        ),
+                       tags$table(width = "100%",class="myTable",
+                                  tags$tr(
+                                    tags$td(width = "25%", tags$div(style = paste(localStyle,"text-align: left"), "Display:")),
+                                    tags$td(width = "35%",selectInput("likelihoodType",label=NULL,
+                                                                      choices=c("Samples","Populations"),selected="Populations",
+                                                                      selectize=FALSE)
+                                    ),
+                                    tags$td(width = "25%",selectInput("possible_cutaway",label=NULL,
+                                                                      choices=c("all","cutaway"),selected="all",
+                                                                      selectize=FALSE)
+                                    ),
+                                  ),
+                       ),
               ),
               tabPanel("#",
                        style = paste("background: ",subpanelcolours$analysisC), 
@@ -150,22 +186,6 @@ AnalysisTab <-
                        tags$table(width = "100%",class="myTable",
                                   tags$tr(
                                     tags$td(width = "20%", tags$div(style = paste(localStyle,"text-align: left"), "Infer:")),
-                                  )
-                       ),
-                       tags$table(width = "100%",class="myTable",
-                                  tags$tr(
-                                    tags$td(width = "40%", tags$div(style = localPlainStyle, "Eq variance?")),
-                                    tags$td(width = "5%", 
-                                            checkboxInput("Welch",label=NULL,value=!braw.def$evidence$Welch),
-                                    ),
-                                    tags$td(width = "20%", tags$div(style = localPlainStyle, "Transform")),
-                                    tags$td(width = "35%", 
-                                            selectInput("Transform",label=NULL,
-                                                        choices=c("None","Log","Exp"),
-                                                        selected=braw.def$evidence$Transform,
-                                                        selectize=FALSE
-                                            ),
-                                    )
                                   )
                        ),
                        tags$table(width = "100%",class="myTable",

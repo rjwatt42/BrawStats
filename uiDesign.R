@@ -89,25 +89,29 @@ DesignTab <-
                                       )
                            ),
                            conditionalPanel(condition  = "input.sRangeOn",
-                                            fluidRow(
-                                              column(width=6,offset=0,
-                                                     sliderInput("sDVRange",
-                                                                 label="DV:",
+                                            tags$table(width = "100%",class="myTable",
+                                                       tags$tr(
+                                                         tags$td(width = "30%", tags$div(style = localStyle, "Lower limit:")),
+                                                         tags$td(width = "20%",
+                                                                 numericInput("sIVRange1",
+                                                                 label=NULL,
                                                                  min = -braw.env$fullRange,
                                                                  max = braw.env$fullRange,
                                                                  step = 0.1,
-                                                                 value = braw.def$design$sDVRange
-                                                     )
-                                              ),
-                                              column(width=6,offset=0,
-                                                     sliderInput("sIVRange",
-                                                                 label="IV:",
-                                                                 min = -braw.env$fullRange,
-                                                                 max = braw.env$fullRange,
-                                                                 step = 0.1,
-                                                                 value = braw.def$design$sIVRange
-                                                     )
-                                              )
+                                                                 value = -braw.env$fullRange
+                                                                 )
+                                                         ),
+                                                         tags$td(width = "30%", tags$div(style = localStyle, "Upper limit:")),
+                                                         tags$td(width = "20%",
+                                                                 numericInput("sIVRange2",
+                                                                              label=NULL,
+                                                                              min = -braw.env$fullRange,
+                                                                              max = braw.env$fullRange,
+                                                                              step = 0.1,
+                                                                              value = braw.env$fullRange
+                                                                 )
+                                                         )
+                                                       )
                                             )
                            ),
                            uiCheating("")

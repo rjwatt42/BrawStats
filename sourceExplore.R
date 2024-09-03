@@ -130,7 +130,8 @@ updateExploreShow<-function() {
                     par1=input$Explore_par1D,
                     par2=input$Explore_par2D,
                     dimension=input$Explore_dimD,
-                    whichEffect=input$whichEffectD
+                    whichEffect=input$whichEffectD,
+                    effectType=input$EvidenceEffect_type
             )
             },
             "Analysis"={
@@ -139,7 +140,7 @@ updateExploreShow<-function() {
                       par2=input$Explore_par2A,
                       dimension=input$Explore_dimA,
                       whichEffect=input$whichEffectA,
-                      nsims=as.numeric(input$Explore_lengthA)
+                      effectType=input$EvidenceEffect_type
               )
             }
   )

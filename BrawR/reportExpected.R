@@ -56,10 +56,13 @@ reportExpected<-function(expectedResult=braw.res$expected,showType="Basic",
   outputText<-c(outputText,rep("",nc))
   
   outputText<-c(outputText,paste0("\b",whichEffect),rep("",nc-1))
-  if (!(is.null(IV2) | is.null(result$rIVIV2DV))){
+  if (!is.null(IV2) && effectType=="all"){
     outputText<-c(outputText,"","\bdirect","","","\bunique","","","\btotal","")
-    }
-
+  }
+  if (!is.null(IV2) && effectType!="all"){
+    outputText<-c(outputText,"",paste0("\b",effectType),"",""," ","",""," ","")
+  }
+  
   if (is.null(IV2)) {
     rs<-matrix(result$rIV,ncol=1)
     ps<-matrix(result$pIV,ncol=1)

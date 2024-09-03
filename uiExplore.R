@@ -50,8 +50,8 @@ designChoices=list("Sampling"=list("Sample Size" = "n",
                                    "Usage" = "Usage"),
                    "Anomalies"=list("Dependence" = "Dependence",
                                     "Outliers" = "Outliers",
-                                    "IV Range" = "IVRange",
-                                    "DV Range" = "DVRange")
+                                    "IV RangeC" = "IVRangeC",
+                                    "IV RangeE" = "IVRangeE")
 )
 
 designChoicesExtra=list("Sampling"=list("Sample Size" = "n",
@@ -61,8 +61,8 @@ designChoicesExtra=list("Sampling"=list("Sample Size" = "n",
                                    ),
                    "Anomalies"=list("Dependence" = "Dependence",
                                     "Outliers" = "Outliers",
-                                    "IV Range" = "IVRange",
-                                    "DV Range" = "DVRange"),
+                                    "IV RangeC" = "IVRangeC",
+                                    "IV RangeE" = "IVRangeE"),
                    "Cheating"=list("CheatMethod" = "Cheating",
                                    "CheatAmount" = "CheatingAmount"),
                    "Replications"=list("SigOnly"="SigOnly",
@@ -244,7 +244,8 @@ ExploreTab <-
                                               ),
                                             ),
                                             tags$tr(
-                                              tags$td(width = "15%", 
+                                              tags$td(width = "10%",style = localPlainStyle),
+                                              tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectD", label=NULL,
                                                                                    whichEffectShow, selected="All",selectize = FALSE)
@@ -321,7 +322,8 @@ ExploreTab <-
                                               ),
                                             ),
                                             tags$tr(
-                                              tags$td(width = "15%", 
+                                              tags$td(width = "10%",style = localPlainStyle),
+                                              tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectA", label=NULL,
                                                                                    whichEffectShow, selected="All",selectize = FALSE)

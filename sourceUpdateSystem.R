@@ -238,7 +238,7 @@ updateDesign<-function(){
                sBudgetOn=input$sBudgetOn,sNBudget=input$sNBudget,
                sMethod=makeSampling(input$sMethod),
                sIV1Use=input$sIV1Use,sIV2Use=input$sIV2Use, sWithinCor=0.5,
-               sRangeOn=input$sRangeOn, sIVRange=input$sIVRange, sDVRange=input$sDVRange, 
+               sRangeOn=input$sRangeOn, sIVRange=c(input$sIVRange1,input$sIVRange2), 
                sDependence=input$sDependence, sOutliers=input$sOutliers,
                sCheating=input$sCheating,sCheatingLimit=input$sCheatingLimit,sCheatingAttempts=input$sCheatingAttempts,sCheatingBudget=input$sCheatingBudget,
                Replication=makeReplication(
