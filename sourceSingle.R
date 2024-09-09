@@ -144,7 +144,7 @@ doIt<-editVar$data
     doPossible(
       makePossible(
         typePossible=input$likelihoodType,
-        targetSample<-result$rIV,
+        targetSample<-result,
         hypothesis=updateHypothesis(),design=updateDesign(),
         UsePrior=input$likelihoodUsePrior,
         prior=evidence$prior
