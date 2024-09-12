@@ -280,6 +280,7 @@ updateEvidence<-function(){
     shortHand=input$shortHand,
     llr=list(e1=input$llr1,e2=input$llr2),
     Welch=!input$Welch,Transform=input$Transform,
+    McFaddens=input$McFaddens,
     prior=makeWorld()
   )
   

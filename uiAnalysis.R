@@ -45,7 +45,20 @@ AnalysisTab <-
                                       ),
                                       tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
                                     )
-                         ),
+                                    ),
+                       conditionalPanel(condition="input.DVtype == 'Categorical'",
+                                        tags$table(width = "100%",class="myTable",
+                                                   tags$tr(
+                                                     tags$td(width = "50%", tags$div(style = localPlainStyle, "Use McFaddens")),
+                                                     tags$td(width = "40%", 
+                                                             checkboxInput("McFaddens",label=NULL,
+                                                                           value=braw.def$evidence$McFaddens
+                                                             ),
+                                                     ),
+                                                     tags$td(width = "10%", tags$div(style = localPlainStyle, "")),
+                                                   )
+                                        )
+                       ),
                        conditionalPanel(condition="input.IV2choice != 'none'",
                                         tags$table(width = "100%",class="myTable",
                                                    tags$tr(
