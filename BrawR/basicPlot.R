@@ -246,7 +246,7 @@ dataLabel<-function(data,label, hjust=0, vjust=0, fill="white",colour="black",pa
   
 }
 dataText<-function(data,label, hjust=0, vjust=0, colour="black",size=1,fontface="plain") {
-  mathlabel<-grepl("['^']{1}",label) | grepl("['[']{1}",label)
+  mathlabel<-grepl(".['^']{1}",label) | grepl(".['[']{1}",label)
   if (any(mathlabel)) {
     label<-deparse(label)
   } else {
