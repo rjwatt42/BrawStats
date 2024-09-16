@@ -71,7 +71,7 @@ makeExpectedResult <- function() {
       else 
         showNotification(paste0("Expected: adding (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
     }
-    expectedResult<-doExpected(nsims=nsims,expectedResult=braw.res$expected,doingNull=TRUE,
+    expectedResult<-doExpected(nsims=nsims,expectedResult=braw.res$expected,
                                hypothesis=hypothesis,design=design,evidence=evidence)
     if (switches$showProgress) {removeNotification(id = "counting")}
     runningExpected<<-FALSE

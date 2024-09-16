@@ -64,7 +64,7 @@ observeEvent(input$Explore_typeH,{
 # watch for changes to design
 observeEvent(input$Explore_typeD,{
   range<-getExploreRange(list(exploreType=input$Explore_typeD))
-
+ 
   updateNumericInput(session,"Explore_minValD",value=range$minVal,step=getStep(range$minVal,range$np))
   updateNumericInput(session,"Explore_maxValD",value=range$maxVal,step=getStep(range$maxVal,range$np))
   updateNumericInput(session,"Explore_NPointsD",value=range$np,step=1)
@@ -189,7 +189,7 @@ makeExploreResult <- function() {
     else 
       showNotification(paste0("Expected: adding (",nsims,")"),id="counting",duration=Inf,closeButton=FALSE,type="message")
   }
-  exploreResult<-doExplore(explore,nsims=nsims,exploreResult=braw.res$explore,doingNull=TRUE)
+  exploreResult<-doExplore(explore,nsims=nsims,exploreResult=braw.res$explore)
   if (switches$showProgress) removeNotification(id = "counting")
   runningExplore<<-FALSE
   

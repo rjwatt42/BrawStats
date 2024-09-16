@@ -144,14 +144,14 @@ ExploreTab <-
                                               ),
                                               tags$td(width = "15%",style = localPlainStyle,
                                                       conditionalPanel(condition="input.Explore_showH=='Custom'",
-                                                                       selectInput("Explore_par1D", label=NULL, 
+                                                                       selectInput("Explore_par1H", label=NULL, 
                                                                                    exploreShowParams,
                                                                                    selected="rs", selectize=FALSE)
                                                       ),
                                               ),
                                               tags$td(width = "15%",style = localPlainStyle,
                                                       conditionalPanel(condition="input.Explore_showH=='Custom'",
-                                                                       selectInput("Explore_par2D", label=NULL, 
+                                                                       selectInput("Explore_par2H", label=NULL, 
                                                                                    exploreShowParams,
                                                                                    selected="p", selectize=FALSE)
                                                       ),
