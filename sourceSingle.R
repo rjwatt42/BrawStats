@@ -225,10 +225,9 @@ makeSampleReport <- function()  {
   doIt<-editVar$data
 
   result<-sampleAnalysis()        
-  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
-  
+  if (is.null(result))  return(HTML(reportPlot(NULL)))
   g<-reportSample(result)
-  g
+  return(HTML(g))
 }
 
 # single descriptive report
@@ -236,10 +235,10 @@ makeDescriptiveReport <- function()  {
   doIt<-c(editVar$data,input$input$evidenceCaseOrder,input$rInteractionOn,input$dataType)
 
   result<-sampleAnalysis()
-  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
+  if (is.null(result))  return(HTML(reportPlot(NULL)))
 
   g<-reportDescription(result)
-  g
+  return(HTML(g))
 }
 
 # single inferential report
@@ -247,10 +246,10 @@ makeInferentialReport <- function()  {
   doIt<-c(editVar$data,input$Welch,input$Transform,input$evidenceCaseOrder,input$analysisType,input$dataType,input$rInteractionOn)
   
   result<-sampleAnalysis()
-  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
+  if (is.null(result))  return(HTML(reportPlot(NULL)))
   
   g<-reportInference(result,analysisType = input$analysisType)        
-  g
+  return(HTML(g))
 }
 
 # single likelihood report
@@ -261,7 +260,7 @@ makeLikelihoodReport <- function() {
   doIt<-editVar$data
   
   result<-sampleAnalysis()
-  if (is.null(result))  {return(ggplot()+braw.env$blankTheme())}
+  if (is.null(result))  return(HTML(reportPlot(NULL)))
   
   evidence<-updateEvidence()
   g<-reportLikelihood(
@@ -275,11 +274,11 @@ makeLikelihoodReport <- function() {
       )
     )
   )
-  return(g)
+  return(HTML(g))
 }
 
 
-output$SampleReport <- renderPlot({
+output$SampleReport <- renderUI({
   if (debug) debugPrint("SampleReport")
   doIt<-editVar$data
   g<-makeSampleReport()
@@ -287,7 +286,7 @@ output$SampleReport <- renderPlot({
   g
 })
 
-output$DescriptiveReport <- renderPlot({
+output$DescriptiveReport <- renderUI({
   if (debug) debugPrint("DescriptiveReport")
   doIt<-editVar$data
   g<-makeDescriptiveReport()
@@ -295,7 +294,7 @@ output$DescriptiveReport <- renderPlot({
   g
 })
 
-output$InferentialReport <- renderPlot({
+output$InferentialReport <- renderUI({
   if (debug) debugPrint("InferentialReport")
   doIt<-editVar$data
   g<-makeInferentialReport()
@@ -303,7 +302,7 @@ output$InferentialReport <- renderPlot({
   g
 })
 
-output$LikelihoodReport <- renderPlot({
+output$LikelihoodReport <- renderUI({
   if (debug) debugPrint("InferentialReport")
   doIt<-editVar$data
   g<-makeLikelihoodReport()
@@ -311,7 +310,7 @@ output$LikelihoodReport <- renderPlot({
   g
 })
 
-output$SampleReport1 <- renderPlot({
+output$SampleReport1 <- renderUI({
   if (debug) debugPrint("SampleReport")
   doIt<-editVar$data
   g<-makeSampleReport()
@@ -319,7 +318,7 @@ output$SampleReport1 <- renderPlot({
   g
 })
 
-output$DescriptiveReport1 <- renderPlot({
+output$DescriptiveReport1 <- renderUI({
   if (debug) debugPrint("DescriptiveReport")
   doIt<-editVar$data
   g<-makeDescriptiveReport()
@@ -327,7 +326,7 @@ output$DescriptiveReport1 <- renderPlot({
   g
 })
 
-output$InferentialReport1 <- renderPlot({
+output$InferentialReport1 <- renderUI({
   if (debug) debugPrint("InferentialReport")
   doIt<-editVar$data
   g<-makeInferentialReport()
@@ -335,7 +334,7 @@ output$InferentialReport1 <- renderPlot({
   g
 })
 
-output$LikelihoodReport1 <- renderPlot({
+output$LikelihoodReport1 <- renderUI({
   if (debug) debugPrint("InferentialReport")
   doIt<-editVar$data
   g<-makeLikelihoodReport()

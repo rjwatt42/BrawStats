@@ -148,16 +148,18 @@ output$ExpectedPlot1 <- renderPlot({
 
 makeExpectedReport<-function() {
   expectedResult<-makeExpectedResult()
-  if (is.null(expectedResult)) return(ggplot()+braw.env$blankTheme())
+  if (is.null(expectedResult)) return(HTML(reportPlot(NULL)))
   
   expectedShow<-updateExpectedShow()
   showType<-expectedShow$showType
   if (showType=="Custom") showType<-paste0(expectedShow$par1,";",expectedShow$par2)
-  reportExpected(expectedResult,showType=showType,whichEffect=expectedShow$whichEffect,effectType=expectedShow$effectType)
+  g<-reportExpected(expectedResult,showType=showType,whichEffect=expectedShow$whichEffect,effectType=expectedShow$effectType)
+  return(HTML(g))
+  
 }
 
 # expected report
-output$ExpectedReport <- renderPlot({
+output$ExpectedReport <- renderUI({
   if (debug) debugPrint("ExpectedReport - start")
   doIt<-input$EvidenceExpectedRun
   g<-makeExpectedReport()
@@ -165,7 +167,7 @@ output$ExpectedReport <- renderPlot({
   g
 })
 
-output$ExpectedReport1 <- renderPlot({
+output$ExpectedReport1 <- renderUI({
   if (debug) debugPrint("ExpectedReport1 - start")
   doIt<-input$EvidenceExpectedRun
   g<-makeExpectedReport()

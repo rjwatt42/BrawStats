@@ -87,7 +87,7 @@ shinyServer(function(input, output, session) {
     currentGraph<-input$Graphs
     currentReport<-input$Reports
     
-    BrawOpts(BW=input$WhiteGraphs,fontScale=globalFontScale*(1+input$LargeGraphs),reducedOutput = TRUE)
+    BrawOpts(BW=input$WhiteGraphs,fontScale=globalFontScale*(1+input$LargeGraphs),reducedOutput = TRUE,reportHTML=braw.env$reportHTML)
 
     if (input$LargeGraphs) {
       output$mainColumns <- renderUI({

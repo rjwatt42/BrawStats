@@ -5,26 +5,26 @@ MainReports <- function() {
                         id="Reports",
                         tabPanel("Sample",     
                                  style="margin:0px;padding:0px;",
-                                 plotOutput("SampleReport")
+                                 htmlOutput("SampleReport")
                                  ),
                         tabPanel("Describe",   
                                  style="margin:0px;padding:0px;",
-                                 plotOutput("DescriptiveReport")
+                                 htmlOutput("DescriptiveReport")
                                  ),
                         tabPanel("Infer",      
                                  style="margin:0px;padding:0px;",
-                                 plotOutput("InferentialReport")
+                                 htmlOutput("InferentialReport")
                         ),
                         tabPanel("Likelihood",      
                                  style="margin:0px;padding:0px;",
-                                 plotOutput("LikelihoodReport")
+                                 htmlOutput("LikelihoodReport")
                         )
                         ,tabPanel("Expect",value="Expect",   
                                   style="margin:0px;padding:0px;",
-                                  plotOutput("ExpectedReport"))
+                                  htmlOutput("ExpectedReport"))
                         ,tabPanel("Explore",value="Explore",
                                   style="margin:0px;padding:0px;",
-                                  plotOutput("ExploreReport")
+                                  htmlOutput("ExploreReport")
                                   )
             )
   )
@@ -37,7 +37,7 @@ MainReports1 <- function() {
                         id="Reports",
                         tabPanel("Sample",     
                                  style="margin:0px;padding:0px;",
-                                 plotOutput("SampleReport1")
+                                 htmlOutput("SampleReport1")
                                  ),
                         tabPanel("Describe",   
                                  style="margin:0px;padding:0px;",

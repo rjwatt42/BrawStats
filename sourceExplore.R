@@ -233,22 +233,22 @@ output$ExplorePlot1 <- renderPlot( {
 makeExploreReport<-function() {
   
   exploreResult<-makeExploreResult()
-  if (is.null(exploreResult)) return(ggplot()+braw.env$blankTheme())
+  if (is.null(exploreResult)) return(HTML(reportPlot(NULL)))
   
   exploreShow<-updateExploreShow()
   if (exploreShow$showType=="Custom") exploreShow$showType<-paste0(exploreShow$par1,";",exploreShow$par2)
   g<-reportExplore(exploreResult,showType=exploreShow$showType,
                  whichEffect=exploreShow$whichEffect,effectType=exploreShow$effectType
   )
-  return(g)
+  return(HTML(g))
 }
 
-output$ExploreReport <- renderPlot({
+output$ExploreReport <- renderUI({
   doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA,
           input$STMethod,input$alpha)
   makeExploreReport()
 })
-output$ExploreReport1 <- renderPlot({
+output$ExploreReport1 <- renderUI({
   doIt<-c(input$exploreRunH,input$exploreRunD,input$exploreRunA,
           input$STMethod,input$alpha)
   makeExploreReport()

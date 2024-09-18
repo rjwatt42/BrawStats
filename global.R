@@ -6,7 +6,7 @@ files<-dir("BrawR",full.names = TRUE)
 for (fi in 1:length(files)) source(files[fi])
 
 globalFontScale<-1.25
-BrawOpts(fontScale = globalFontScale)
+BrawOpts(fontScale = globalFontScale,reportHTML=TRUE)
 
 ################################
 
