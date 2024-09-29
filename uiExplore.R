@@ -169,7 +169,7 @@ ExploreTab <-
                                               tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectH", label=NULL,
-                                                                                   whichEffectShow, selected="Mains",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
                                             )
                                  ),
@@ -248,7 +248,7 @@ ExploreTab <-
                                               tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectD", label=NULL,
-                                                                                   whichEffectShow, selected="Mains",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
                                             )),
                                  tags$table(width = "100%",class="myTable",
@@ -326,7 +326,7 @@ ExploreTab <-
                                               tags$td(width = "35%", 
                                                       conditionalPanel(condition="input.IV2choice != 'none'",
                                                                        selectInput("whichEffectA", label=NULL,
-                                                                                   whichEffectShow, selected="Mains",selectize = FALSE)
+                                                                                   whichEffectShow, selected="All",selectize = FALSE)
                                                       )),
                                             )),
                                  tags$table(width = "100%",class="myTable",
