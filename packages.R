@@ -6,7 +6,8 @@
 list.of.packages<-c("ggplot2","grDevices",
                     "mnormt","lme4",
                     "readxl","writexl","stringr","clipr",
-                    "car","pracma"
+                    "car","pracma",
+                    "shinyBS","shinyjs","shinyWidgets"
 )
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
