@@ -10,7 +10,7 @@ list.of.packages<-c("ggplot2","grDevices",
                     "shinyBS","shinyjs","shinyWidgets"
 )
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)>0) install.packages(new.packages,repos="http://cran.fhcrc.org")
+if(length(new.packages)>0) install.packages(new.packages)
 
 library(ggplot2)
 library(grDevices)
